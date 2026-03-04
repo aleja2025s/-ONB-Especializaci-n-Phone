@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Refuerzo por Contact Reason — Nu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --purple-900: #2d1b4e;
+      --purple-700: #5c3d99;
+      --purple-500: #820ad1;
+      --purple-400: #9c27b0;
+      --purple-300: #b57edc;
+      --purple-200: #ce93d8;
+      --purple-100: #ebe0f5;
+      --purple-50: #f5f0fa;
+      --pink-soft: #fce4ec;
+      --pink-200: #f8bbd9;
+      --lavender: #e1bee7;
+      --red-soft: #ffebee;
+      --green-soft: #e8f5e9;
+      --white: #fff;
+      --gray-800: #4a4a4a;
+      --gray-600: #6b6b6b;
+      --gray-400: #9e9e9e;
+      --font-title: 1.5rem;
+      --font-subtitle: 0.9rem;
+      --font-body: 1rem;
+      --font-body-sm: 0.9375rem;
+      --font-label: 0.875rem;
+      --font-small: 0.75rem;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Nunito Sans', -apple-system, sans-serif;
+    }
+
+    body {
+      font-family: 'Nunito Sans', -apple-system, sans-serif;
+      background: linear-gradient(145deg, #6a1b9a 0%, #8e24aa 35%, #ab47bc 60%, #ce93d8 100%);
+      color: var(--gray-800);
+      line-height: 1.6;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: radial-gradient(circle at 20% 50%, rgba(142, 68, 173, 0.2) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 20%, rgba(156, 39, 176, 0.2) 0%, transparent 50%),
+                  radial-gradient(circle at 40% 80%, rgba(106, 27, 154, 0.2) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .presentation-container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      box-sizing: border-box;
+    }
+    .slide {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: calc(100% - 24px);
+      max-width: 1320px;
+      height: calc(100vh - 72px);
+      max-height: 900px;
+      display: flex;
+      flex-direction: column;
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 24px;
+      box-shadow: 0 20px 50px rgba(106, 27, 154, 0.2);
+      overflow: hidden;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      z-index: 2;
+    }
+    .slide-header {
+      padding: 26px 32px 22px;
+      text-align: center;
+      border-bottom: 1px solid var(--lavender);
+      background: linear-gradient(180deg, #fff 0%, var(--purple-50) 50%, var(--pink-soft) 100%);
+      border-radius: 20px 20px 0 0;
+      flex-shrink: 0;
+    }
+    .slide-header h1 {
+      color: var(--purple-700);
+      font-size: var(--font-title);
+      font-weight: 700;
+      margin: 0 0 6px;
+      letter-spacing: -0.01em;
+    }
+    .slide-header .subtitle {
+      color: var(--gray-600);
+      font-size: var(--font-subtitle);
+      font-weight: 500;
+    }
+    .slide-content {
+      padding: 24px 32px 32px;
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+    .slide-content::-webkit-scrollbar { width: 8px; }
+    .slide-content::-webkit-scrollbar-track { background: #f5f0fa; border-radius: 4px; }
+    .slide-content::-webkit-scrollbar-thumb { background: var(--purple-400); border-radius: 4px; }
+    .slide-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 24px;
+      background: linear-gradient(to top, rgba(142, 68, 173, 0.95), rgba(206, 147, 216, 0.9));
+      border-radius: 28px 28px 0 0;
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      border-bottom: none;
+      box-shadow: 0 -6px 24px rgba(106, 27, 154, 0.25);
+      z-index: 1000;
+    }
+    .slide-nav-btn {
+      background: rgba(255, 255, 255, 0.98);
+      color: var(--purple-700);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: var(--font-label);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .slide-nav-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      background: #fff;
+    }
+    .slide-nav-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .slide-indicator { color: rgba(255, 255, 255, 0.95); font-size: var(--font-label); font-weight: 600; }
+    .btn-regresar-global {
+      position: fixed;
+      top: 20px;
+      right: 24px;
+      z-index: 1001;
+      padding: 10px 18px;
+      border-radius: 50px;
+      background: var(--purple-500);
+      color: #fff;
+      border: none;
+      font-size: var(--font-label);
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(106, 27, 154, 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-regresar-global:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(106, 27, 154, 0.4);
+    }
+    #slide-1 .slide-content { padding: 32px 48px 48px; }
+    #slide-1 .intro-block { display: grid; gap: 28px; margin-bottom: 28px; }
+    #slide-1 .intro-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 26px 28px;
+      border: 1px solid var(--purple-100);
+      box-shadow: 0 4px 14px rgba(106, 27, 154, 0.06);
+    }
+    #slide-1 .intro-card.phone-card {
+      background: linear-gradient(145deg, rgba(106, 27, 154, 0.06) 0%, #fff 30%);
+      border-left: 5px solid #6a1b9a;
+    }
+    #slide-1 .intro-card h2 { font-size: 1.2rem; margin: 0 0 14px; color: #6a1b9a; }
+    #slide-1 .intro-card p { margin: 0; color: var(--gray-600); font-size: 1.05rem; line-height: 1.65; }
+    #slide-1 .bpo-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 600px) { #slide-1 .bpo-cards { grid-template-columns: 1fr; } }
+    #slide-1 .slide-content > section { margin-top: 2.5rem; }
+    #slide-1 section h2 { font-size: 1.5rem; margin-bottom: 20px; font-weight: 800; color: #6a1b9a; }
+    #slide-1 .bpo-card-item {
+      background: #fff;
+      border-radius: 14px;
+      padding: 18px 20px;
+      border: 1px solid var(--purple-100);
+      box-shadow: 0 4px 14px rgba(106, 27, 154, 0.06);
+      list-style: none;
+      margin: 0;
+    }
+    #slide-1 .bpo-card-item .bpo-name {
+      font-size: var(--font-body);
+      font-weight: 700;
+      color: #6a1b9a;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--purple-100);
+      display: block;
+    }
+    #slide-1 .bpo-card-item .cr-items { margin: 0; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    #slide-1 .bpo-card-item .cr-items li { margin: 0; padding: 0; }
+    #slide-1 .bpo-card-item .cr-items li::before { display: none; }
+    #slide-1 .bpo-card-item .cr-item-link {
+      display: block;
+      padding: 12px 16px;
+      background: #f3e5f5;
+      color: #6a1b9a;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 600;
+      line-height: 1.4;
+      border-radius: 12px;
+      border: 2px solid #ce93d8;
+      transition: background 0.2s, border-color 0.2s, transform 0.2s;
+    }
+    #slide-1 .bpo-card-item .cr-item-link:hover {
+      background: #6a1b9a;
+      color: #fff;
+      border-color: #6a1b9a;
+      transform: translateY(-1px);
+    }
+    section h2 { font-size: var(--font-body-sm); font-weight: 700; color: #6a1b9a; margin: 0 0 0.75rem; }
+    .cr-resumen-list { display: flex; flex-direction: column; gap: 1.5rem; }
+    .slide-2-importante { margin-top: 1.75rem; padding: 1rem 1.25rem; background: var(--purple-50); border-left: 4px solid #6a1b9a; border-radius: 0 10px 10px 0; font-size: 1rem; color: var(--purple-800); font-weight: 600; }
+    .cr-resumen-item {
+      background: #fff;
+      border-radius: 16px;
+      padding: 1.5rem 1.75rem;
+      box-shadow: 0 4px 20px rgba(106, 27, 154, 0.08);
+      border: 1px solid var(--purple-100);
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .cr-resumen-item:hover { box-shadow: 0 8px 28px rgba(106, 27, 154, 0.12); border-color: var(--purple-200); }
+    .cr-resumen-titulo { display: block; color: #6a1b9a; font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.35; }
+    .cr-resumen-desc { margin: 0 0 0.25rem; font-size: 0.95rem; line-height: 1.6; color: var(--gray-600); }
+    .selection-intro { color: var(--gray-600); font-size: var(--font-body); line-height: 1.6; margin-bottom: 1.25rem; }
+    .ruleta-wrap .slide-4-pill { padding: 8px 16px; border-radius: 50px; font-size: var(--font-label); font-weight: 600; background: var(--purple-100); color: var(--purple-700); }
+    .quiz-ruleta-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 380px; padding: 1rem 0; }
+    .quiz-ruleta-card {
+      background: #fff;
+      border-radius: 28px;
+      padding: 36px 44px;
+      box-shadow: 0 12px 40px rgba(106, 27, 154, 0.15);
+      border: 2px solid var(--lavender);
+      text-align: center;
+      max-width: 520px;
+    }
+    .quiz-ruleta-card-subtitle { font-size: 1.1rem; color: var(--gray-600); margin: 0 0 1.75rem; line-height: 1.45; }
+    .quiz-ruleta-btn {
+      background: linear-gradient(145deg, var(--purple-500), var(--lavender));
+      color: #fff;
+      border: none;
+      padding: 0.9rem 1.5rem;
+      border-radius: 16px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      box-shadow: 0 4px 14px rgba(106, 27, 154, 0.25);
+    }
+    .quiz-ruleta-btn:hover { transform: scale(1.03); box-shadow: 0 6px 18px rgba(106, 27, 154, 0.35); }
+
+    /* ——— Slide 3: Casos a practicar ——— */
+    #slide-3 .slide-content { padding: 28px 36px 36px; }
+    .selection-summary { font-size: var(--font-label); color: var(--purple-700); font-weight: 600; margin-bottom: 1rem; }
+    .casos-selector-list { display: flex; flex-direction: column; gap: 0; }
+    .casos-tabs { margin-top: 0.5rem; }
+    .casos-tabs-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.25rem; border-bottom: 2px solid var(--purple-100); padding-bottom: 0; }
+    .casos-tab-btn { padding: 0.65rem 1.25rem; font-size: 1rem; font-weight: 600; color: var(--purple-700); background: transparent; border: none; border-bottom: 3px solid transparent; margin-bottom: -2px; cursor: pointer; font-family: inherit; border-radius: 10px 10px 0 0; transition: background 0.2s, color 0.2s, border-color 0.2s; }
+    .casos-tab-btn:hover { background: var(--purple-50); color: var(--purple-800); }
+    .casos-tab-btn.active { background: #fff; color: #6a1b9a; border-bottom-color: #6a1b9a; box-shadow: 0 -2px 8px rgba(106, 27, 154, 0.08); }
+    .casos-tabs-panels { margin-top: 0; }
+    .casos-tab-panel { display: none; }
+    .casos-tab-panel.active { display: block; }
+    .casos-tabs-panels .cr-group { margin-bottom: 0; }
+    .cr-group {
+      background: #fff;
+      border: 2px solid var(--purple-100);
+      border-radius: 16px;
+      padding: 18px 22px;
+      box-shadow: 0 4px 16px rgba(106, 27, 154, 0.08);
+    }
+    .cr-group-title {
+      font-weight: 700;
+      color: var(--purple-700);
+      font-size: var(--font-body);
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--purple-100);
+    }
+    .cr-group-casos { display: flex; flex-direction: column; gap: 10px; }
+    .casos-selector-list label {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 16px 20px;
+      background: #fff;
+      border: 2px solid var(--purple-100);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(106, 27, 154, 0.04);
+    }
+    .casos-selector-list label:hover {
+      background: var(--purple-50);
+      border-color: var(--purple-300);
+      box-shadow: 0 4px 14px rgba(106, 27, 154, 0.1);
+    }
+    .casos-selector-list label:has(input:checked) {
+      background: linear-gradient(135deg, rgba(106, 27, 154, 0.08) 0%, rgba(156, 39, 176, 0.05) 100%);
+      border-color: var(--purple-500);
+      box-shadow: 0 4px 18px rgba(106, 27, 154, 0.15);
+    }
+    .casos-selector-list input[type="checkbox"] { position: absolute; opacity: 0; pointer-events: none; }
+    .casos-selector-list .case-check {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--purple-300);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px;
+      transition: all 0.2s;
+    }
+    .casos-selector-list .case-check .check-icon { display: none; color: #fff; font-size: 0.9rem; font-weight: 700; }
+    .casos-selector-list label:has(input:checked) .case-check {
+      background: var(--purple-500);
+      border-color: var(--purple-500);
+    }
+    .casos-selector-list label:has(input:checked) .case-check .check-icon { display: block; }
+    .casos-selector-list .case-num {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: var(--purple-100);
+      color: var(--purple-700);
+      font-size: var(--font-small);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .casos-selector-list label:has(input:checked) .case-num {
+      background: var(--purple-500);
+      color: #fff;
+    }
+    .casos-selector-list .case-label-wrap { flex: 1; min-width: 0; }
+    .casos-selector-list .case-title {
+      display: block;
+      font-weight: 700;
+      color: var(--gray-800);
+      font-size: var(--font-body);
+      line-height: 1.35;
+    }
+    .casos-selector-list .case-context {
+      display: block;
+      font-size: var(--font-label);
+      color: var(--gray-600);
+      margin-top: 6px;
+      line-height: 1.45;
+    }
+    .casos-selector-list .case-enfoque {
+      font-size: var(--font-small);
+      color: var(--purple-700);
+      margin-top: 6px;
+      font-weight: 500;
+      line-height: 1.35;
+    }
+    .selection-actions { margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--purple-100); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; }
+    .btn-practicar {
+      background: linear-gradient(135deg, var(--purple-500) 0%, #7b2c9e 100%);
+      color: #fff;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 14px;
+      font-size: var(--font-body);
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      box-shadow: 0 4px 16px rgba(106, 27, 154, 0.3);
+      transition: all 0.2s ease;
+    }
+    .btn-practicar:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 22px rgba(106, 27, 154, 0.4);
+    }
+    .btn-practicar:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ——— Ruleta: círculo, centro, leyenda ——— */
+    .quiz-ruleta-circle-wrap { position: relative; width: 280px; height: 280px; margin: 0 auto 2rem; }
+    .quiz-ruleta-circle {
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: conic-gradient(var(--lavender) 0deg 72deg, var(--pink-200) 72deg 144deg, var(--lavender) 144deg 216deg, var(--pink-200) 216deg 288deg, var(--lavender) 288deg 360deg);
+      border: 8px solid #fff;
+      box-shadow: 0 8px 32px rgba(106, 27, 154, 0.22);
+      position: absolute;
+      top: 0;
+      left: 0;
+      transition: transform 0.1s linear;
+    }
+    .quiz-ruleta-circle.spinning { animation: ruleta-spin 2.5s cubic-bezier(0.2, 0.8, 0.3, 1) forwards; }
+    @keyframes ruleta-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(1800deg); } }
+    .quiz-ruleta-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 3px 18px rgba(0,0,0,0.14);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--purple-700);
+      z-index: 2;
+    }
+    .quiz-ruleta-pointer {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #d32f2f;
+      font-size: 2.25rem;
+      z-index: 3;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    }
+    .quiz-ruleta-leyenda-wrap { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px 24px; margin-bottom: 1.5rem; font-size: 1rem; color: var(--gray-600); }
+    .quiz-ruleta-leyenda-item { display: inline-flex; align-items: center; gap: 8px; }
+    .quiz-leyenda-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+    .quiz-ruleta-instruccion { font-size: 1rem; color: var(--purple-700); margin-top: 1rem; display: inline-flex; align-items: center; gap: 8px; background: var(--purple-100); padding: 8px 18px; border-radius: 50px; }
+    .quiz-ruleta-arrow { color: var(--purple-500); font-weight: 700; }
+    .quiz-girar-btn { padding: 1.1rem 2.25rem; font-size: 1.1rem; background: linear-gradient(90deg, #ec407a, #ab47bc) !important; border: none; }
+    .quiz-question-screen { display: none; padding-top: 0.5rem; }
+    .quiz-question-screen[style*="display: block"], .quiz-question-screen.active { display: block !important; }
+    .quiz-actions { margin-top: 1.5rem; text-align: center; }
+    .quiz-pregunta { background: linear-gradient(145deg, #fff 0%, var(--purple-50) 100%); border: 1px solid var(--lavender); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 4px 16px rgba(106, 27, 154, 0.08); }
+    .quiz-pregunta .quiz-contexto { font-size: 0.95rem; color: var(--gray-800); padding: 1rem 1.25rem; background: #faf5ff; border-radius: 12px; border-left: 4px solid var(--purple-500); margin-bottom: 1rem; line-height: 1.6; }
+    .quiz-pregunta .quiz-label { font-size: var(--font-label); font-weight: 700; color: var(--purple-700); margin-bottom: 0.75rem; display: block; }
+    .quiz-opciones-wrap { display: flex; flex-direction: column; gap: 8px; }
+    .quiz-opcion {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 0.9rem 1.15rem;
+      border: 2px solid var(--lavender);
+      border-radius: 12px;
+      background: #fff;
+      font-size: var(--font-body);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .quiz-opcion:hover:not(.locked) { background: var(--pink-soft); border-color: var(--purple-300); }
+    .quiz-opcion.correcta { background: var(--green-soft); border-color: #4caf50; color: var(--gray-800); }
+    .quiz-opcion.incorrecta { background: var(--red-soft); border-color: #ef9a9a; color: var(--gray-800); }
+    .quiz-feedback { margin-top: 1rem; padding: 1rem 1.25rem; border-radius: 12px; font-size: var(--font-label); line-height: 1.5; }
+    .quiz-feedback.ok { background: var(--green-soft); border: 1px solid #a5d6a7; color: #2e7d32; }
+    .quiz-feedback.error { background: transparent; border: none; color: var(--gray-800); }
+    .quiz-meta.hidden { display: none !important; }
+    .quiz-feedback-intro { margin: 0 0 1rem; font-size: 0.9rem; color: var(--gray-600); }
+    .quiz-feedback-box-label { margin: 0 0 0.35rem; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+    .quiz-feedback-label-correct { color: #2e7d32; }
+    .quiz-feedback-label-incorrect { color: #c62828; }
+    .quiz-feedback-box { padding: 1rem 1.25rem; border-radius: 12px; margin-bottom: 1.25rem; font-size: 0.95rem; line-height: 1.55; background: #fff; }
+    .quiz-feedback-correct { border: 2px solid #4caf50; background: #e8f5e9; color: #1b5e20; }
+    .quiz-feedback-incorrect { border: 2px solid #c62828; background: #ffebee; color: #b71c1c; }
+    .quiz-feedback .quiz-feedback-weduka-title { margin: 1.25rem 0 0.35rem; font-weight: 800; color: #4a148c; font-size: 1.05rem; }
+    .quiz-feedback .quiz-feedback-weduka-section { margin: 0 0 1rem; font-size: 1rem; font-weight: 600; color: #5e35b1; }
+    .quiz-feedback-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 1rem; }
+    .quiz-btn { padding: 0.75rem 1.5rem; border-radius: 12px; font-weight: 700; font-size: 1rem; text-decoration: none; border: none; cursor: pointer; font-family: inherit; display: inline-block; text-align: center; transition: transform 0.2s, box-shadow 0.2s; }
+    .quiz-btn-weduka { background: #6a1b9a; color: #fff !important; box-shadow: 0 3px 12px rgba(106, 27, 154, 0.4); }
+    .quiz-btn-weduka:hover { background: #7b1fa2; color: #fff !important; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(106, 27, 154, 0.5); }
+    .quiz-btn-retry { background: #7b1fa2; color: #fff !important; box-shadow: 0 3px 12px rgba(123, 31, 162, 0.35); }
+    .quiz-btn-retry:hover { background: #6a1b9a; color: #fff !important; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(106, 27, 154, 0.5); }
+
+    /* ——— Slides de caso + Simulación de llamada ——— */
+    .slide-caso .slide-content { padding: 24px 32px 32px; }
+    .caso-weduka-footer { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 2px solid var(--purple-200); text-align: center; }
+    .caso-btn-weduka { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.85rem 1.75rem; background: #6a1b9a; color: #fff !important; font-weight: 700; font-size: 1rem; text-decoration: none; border-radius: 14px; box-shadow: 0 4px 14px rgba(106, 27, 154, 0.4); transition: transform 0.2s, box-shadow 0.2s; border: none; }
+    .caso-btn-weduka:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(106, 27, 154, 0.5); background: #7b1fa2; color: #fff !important; }
+    .caso-btn-weduka-icon { font-size: 1.2rem; }
+    .caso-siguiente-wrap { margin-top: 1.5rem; padding-top: 1rem; text-align: center; }
+    .caso-btn-siguiente { padding: 0.75rem 1.5rem; background: #6a1b9a; color: #fff !important; font-weight: 700; font-size: 1rem; border: none; border-radius: 12px; cursor: pointer; font-family: inherit; box-shadow: 0 3px 12px rgba(106, 27, 154, 0.35); transition: transform 0.2s, box-shadow 0.2s; }
+    .caso-btn-siguiente:hover { background: #7b1fa2; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(106, 27, 154, 0.45); }
+    .slide-caso section { margin-bottom: 1.5rem; }
+    .slide-caso h2 { font-size: var(--font-body-sm); color: var(--purple-700); margin-bottom: 0.5rem; padding-bottom: 0.4rem; border-bottom: 2px solid var(--purple-100); }
+    .caso-badge { display: inline-block; background: linear-gradient(135deg, var(--purple-100), var(--purple-50)); color: var(--purple-700); font-size: var(--font-small); font-weight: 700; padding: 0.35rem 0.75rem; border-radius: 20px; margin-bottom: 1rem; border: 1px solid var(--purple-200); }
+    .contexto, .call-sim-contexto-visible {
+      background: linear-gradient(145deg, #faf5ff 0%, #f3e8ff 100%);
+      padding: 1.25rem 1.5rem;
+      border-radius: 14px;
+      border: 1px solid var(--purple-200);
+      font-size: 0.95rem;
+      color: var(--gray-800);
+      line-height: 1.65;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 2px 12px rgba(106, 27, 154, 0.06);
+      position: relative;
+      overflow: hidden;
+    }
+    .contexto::before, .call-sim-contexto-visible::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+      background: linear-gradient(180deg, var(--purple-500), var(--purple-400));
+      border-radius: 4px 0 0 4px;
+    }
+    .contexto-label { display: inline-flex; align-items: center; gap: 6px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--purple-700); margin-bottom: 0.75rem; }
+    .wrong-box {
+      background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+      padding: 1.15rem 1.35rem;
+      border-radius: 12px;
+      margin-bottom: 1.25rem;
+      border: 1px solid #fecaca;
+      box-shadow: 0 2px 10px rgba(185, 28, 28, 0.06);
+    }
+    .wrong-box .label { font-size: 0.75rem; font-weight: 700; color: #991b1b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.6rem; display: block; }
+    .wrong-box blockquote { margin: 0.5rem 0; padding: 0.5rem 0 0.5rem 1rem; border-left: 3px solid #dc2626; font-style: italic; color: var(--gray-800); font-size: var(--font-body); line-height: 1.5; }
+    .why-wrong {
+      padding: 1.15rem 1.35rem;
+      background: linear-gradient(135deg, #fff 0%, var(--purple-50) 100%);
+      border-radius: 12px;
+      margin-bottom: 1.25rem;
+      border: 1px solid var(--purple-200);
+      box-shadow: 0 2px 10px rgba(106, 27, 154, 0.06);
+    }
+    .why-wrong .label { font-size: 0.75rem; font-weight: 700; color: var(--purple-700); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.6rem; display: block; }
+    .why-wrong ul { margin: 0; padding-left: 1.25rem; font-size: var(--font-body); line-height: 1.55; }
+    .rules-table { width: 100%; border-collapse: collapse; font-size: var(--font-body); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(106, 27, 154, 0.08); margin-bottom: 1.25rem; }
+    .rules-table th { text-align: left; padding: 0.75rem 1rem; background: var(--purple-100); color: var(--purple-700); font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .rules-table td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--purple-100); vertical-align: top; line-height: 1.5; }
+    .rules-table .no-cell { color: #991b1b; background: linear-gradient(135deg, #fef2f2, #fee2e2); }
+    .rules-table .si-cell { color: #166534; background: linear-gradient(135deg, #f0fdf4, #dcfce7); }
+    .phrases { background: linear-gradient(135deg, #ecfdf5, #d1fae5); padding: 1.15rem 1.35rem; border-radius: 12px; border: 1px solid #a7f3d0; margin-bottom: 1.25rem; box-shadow: 0 2px 10px rgba(5, 150, 105, 0.08); }
+    .phrases .label { font-size: 0.75rem; font-weight: 700; color: #065f46; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.6rem; display: block; }
+    .phrases ul { margin: 0; padding-left: 1.25rem; font-size: var(--font-body); line-height: 1.55; }
+    .call-sim-en-casos {
+      margin-top: 0;
+      padding: 20px 0 0;
+      border-top: 2px solid var(--purple-100);
+    }
+    .call-sim-en-casos-title { font-size: 1.05rem; color: var(--purple-700); margin: 0 0 8px; font-weight: 700; }
+    .call-sim-en-casos-desc { margin: 0 0 16px; font-size: 0.95rem; color: var(--gray-600); line-height: 1.5; }
+    .call-sim-btn-iniciar {
+      display: inline-block;
+      padding: 14px 28px;
+      background: linear-gradient(135deg, var(--purple-500), #7b2c9e);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(106, 27, 154, 0.3);
+      transition: all 0.2s ease;
+    }
+    .call-sim-btn-iniciar:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(106, 27, 154, 0.4); }
+    .call-sim-refuerzo { margin-top: 24px; padding-top: 24px; border-top: 2px solid var(--purple-100); }
+    .call-sim-conversacion { background: #faf5ff; border-radius: 12px; padding: 16px; margin-bottom: 20px; max-height: 280px; overflow-y: auto; border: 1px solid var(--purple-100); }
+    .chat-thread { list-style: none; margin: 0; padding: 0; }
+    .chat-msg { display: flex; margin-bottom: 12px; max-width: 92%; }
+    .chat-msg.usuario { justify-content: flex-start; margin-right: auto; }
+    .chat-msg.agente { justify-content: flex-end; margin-left: auto; }
+    .chat-msg .bubble { padding: 10px 14px; border-radius: 14px; font-size: 0.95rem; line-height: 1.45; }
+    .chat-msg.usuario .bubble { background: var(--purple-100); color: var(--purple-900); border-bottom-left-radius: 4px; }
+    .chat-msg.agente .bubble { background: var(--purple-500); color: #fff; border-bottom-right-radius: 4px; }
+    .chat-msg.agente .bubble.incorrecto { background: #b85450; border: 2px solid #8b3a36; }
+    .chat-msg .rol { font-size: 0.7rem; font-weight: 600; margin-bottom: 4px; opacity: 0.9; }
+    .incorrecto-tag { font-size: 0.7rem; color: #fef2f2; background: rgba(0,0,0,0.2); padding: 0.2rem 0.5rem; border-radius: 6px; margin-top: 0.4rem; display: inline-block; }
+    .call-sim-player-bar { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: linear-gradient(180deg, #e8e8e8, #d0d0d0); border-radius: 24px; margin: 14px 0 16px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.08); }
+    .call-sim-player-btn { width: 36px; height: 36px; border-radius: 50%; background: #f5f5f5; border: 1px solid #bbb; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .call-sim-player-time { font-size: 0.85rem; color: #333; min-width: 85px; font-variant-numeric: tabular-nums; }
+    .call-sim-player-range { flex: 1; min-width: 80px; height: 6px; -webkit-appearance: none; appearance: none; background: #b0b0b0; border-radius: 3px; }
+    .call-sim-player-range::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--purple-500); cursor: pointer; }
+    .call-sim-opciones-errores { display: flex; flex-direction: column; gap: 10px; margin: 14px 0 16px; }
+    .call-sim-opciones-errores label { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; background: #fff; border: 2px solid var(--purple-100); border-radius: 10px; cursor: pointer; font-size: 0.9rem; line-height: 1.4; color: var(--gray-800); transition: all 0.2s; }
+    .call-sim-opciones-errores label:hover { border-color: var(--purple-300); background: var(--purple-50); }
+    .call-sim-opciones-errores input { accent-color: var(--purple-500); }
+    .call-sim-opciones-errores label.correcta-seleccion { border-color: #4caf50; background: rgba(76,175,80,0.08); }
+    .call-sim-opciones-errores label.error-seleccion { border-color: #f44336; background: rgba(244,67,54,0.08); }
+    .call-sim-btn-ver-resultado { padding: 10px 20px; background: var(--purple-500); color: #fff; border: none; border-radius: 10px; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: background 0.2s; }
+    .call-sim-btn-ver-resultado:hover { background: var(--purple-700); }
+    .call-sim-tts-wrap { margin-top: 12px; }
+    .call-sim-btn-tts { padding: 10px 18px; background: var(--purple-100); color: var(--purple-700); border: 2px solid var(--purple-300); border-radius: 10px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; }
+    .call-sim-btn-tts:hover:not(:disabled) { background: var(--purple-200); border-color: var(--purple-500); }
+    .call-sim-btn-tts:disabled { opacity: 0.8; cursor: default; }
+    .call-sim-feedback { margin-top: 18px; padding: 14px 18px; border-radius: 10px; font-size: 0.95rem; line-height: 1.5; }
+    .call-sim-feedback.ok { background: rgba(76,175,80,0.12); border-left: 4px solid #4caf50; color: #2e7d32; }
+    .call-sim-feedback.error { background: rgba(244,67,54,0.08); border-left: 4px solid #f44336; color: #c62828; }
+    .call-sim-btn-otra { display: inline-block; padding: 10px 20px; background: var(--purple-500); color: #fff; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; text-decoration: none; font-size: 0.95rem; margin-top: 10px; }
+    .call-sim-btn-otra:hover { color: #fff; background: var(--purple-700); }
+    .caso-clave { background: linear-gradient(135deg, rgba(106,27,154,0.1), rgba(156,39,176,0.06)); border-left: 4px solid var(--purple-500); padding: 0.9rem 1.1rem; border-radius: 10px; margin-bottom: 1.25rem; font-size: var(--font-body); color: var(--gray-800); line-height: 1.5; }
+    .caso-clave strong { color: var(--purple-700); font-size: var(--font-small); text-transform: uppercase; letter-spacing: 0.03em; display: block; margin-bottom: 0.35rem; }
+    .caso-recuerda { background: #f0fdf4; border: 1px solid #bbf7d0; border-left: 4px solid #16a34a; padding: 1rem 1.25rem; border-radius: 10px; margin-top: 1.5rem; font-size: var(--font-body); color: var(--gray-800); line-height: 1.5; }
+    .caso-recuerda strong { color: #166534; font-size: var(--font-small); text-transform: uppercase; letter-spacing: 0.03em; display: block; margin-bottom: 0.35rem; }
+  </style>
+</head>
+<body>
+  <button type="button" class="btn-regresar-global" id="btn-regresar-global" onclick="goToSlide(1)" title="Regresar al inicio">🏠 Regresar a proceso</button>
+  <div class="presentation-container">
+    <div class="slide active" id="slide-1">
+      <header class="slide-header">
+        <h1>Refuerzo por Contact Reason</h1>
+        <p class="subtitle">Entrenamiento dinámico · Nu</p>
+      </header>
+      <div class="slide-content">
+        <div class="intro-block" style="grid-template-columns:1fr;">
+          <div class="intro-card phone-card">
+            <h2><span class="icon">📱</span> Entrenamiento Especialización Phone</h2>
+            <p>Contenido de entrenamiento para canal Phone. Puedes agregar aquí guías, guiones o materiales de esta especialización.</p>
+          </div>
+        </div>
+        <section style="border:none;padding:0;">
+          <h2>Contact Reasons por BPO</h2>
+          <div class="bpo-cards">
+            <div class="bpo-card-item">
+              <span class="bpo-name">Teleperformance (TP)</span>
+              <ul class="cr-items">
+                <li><a href="#" class="cr-item-link" onclick="goToSlide(2); return false;">Dudas sobre el Resultado de Solicitud (Declinado, Cancelado o Erróneo)</a></li>
+                <li><a href="#" class="cr-item-link" onclick="goToSlide(2); return false;">Errores en el flujo de registro</a></li>
+              </ul>
+            </div>
+            <div class="bpo-card-item">
+              <span class="bpo-name">Konecta</span>
+              <ul class="cr-items">
+                <li><a href="#" class="cr-item-link" onclick="goToSlide(2); return false;">Dudas sobre el Resultado de Solicitud (Declinado, Cancelado o Erróneo)</a></li>
+                <li><a href="#" class="cr-item-link" onclick="goToSlide(2); return false;">Registro, aplicación e información de productos Nu (Prospecto)</a></li>
+              </ul>
+            </div>
+          </div>
+          <p class="slide-2-importante">Importante: ¡Esta guía es interactiva! Utiliza los botones 🟣 (Morado) para navegar y consultar el detalle de cada proceso.</p>
+        </section>
+      </div>
+    </div>
+    <div class="slide" id="slide-2">
+      <header class="slide-header">
+        <h1>Contact Reasons</h1>
+        <p class="subtitle">Qué no hacer y qué hacer</p>
+      </header>
+      <div class="slide-content">
+        <section style="border:none;padding:0;">
+          <div id="slide-2-cr-content" class="cr-resumen-list">
+            <div class="cr-resumen-item">
+              <strong class="cr-resumen-titulo">Registro, aplicación e información de productos Nu (Prospecto)</strong>
+              <p class="cr-resumen-desc">Prospecto (no cliente) se contacta para pedir información general sobre las características, costos o requisitos de productos Nu (Ej. Tarjeta de Crédito, Cuenta, CDT, etc).</p>
+            </div>
+            <div class="cr-resumen-item">
+              <strong class="cr-resumen-titulo">Dudas sobre el Resultado de Solicitud (Declinado, Cancelado o Erróneo)</strong>
+              <p class="cr-resumen-desc">Prospecto se contacta después de recibir el resultado de su aplicación. (Ej. Fue declinado/rechazado y pregunta por qué, está confundido con el producto que se le aprobó).</p>
+            </div>
+            <div class="cr-resumen-item">
+              <strong class="cr-resumen-titulo">Errores en el flujo de registro</strong>
+              <p class="cr-resumen-desc">Prospecto está atascado en medio del formulario de aplicación debido a errores de la app (Ej. no carga la toma de foto, no avanza la pantalla).</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+    <div class="slide" id="slide-3">
+      <header class="slide-header">
+        <h1>Casos a practicar</h1>
+        <p class="subtitle">Elige el caso que quieras reforzar</p>
+      </header>
+      <div class="slide-content">
+        <p class="selection-intro">Selecciona uno de los casos según tu necesidad de refuerzo. Luego inicia la práctica para revisar cada caso en formato llamada, errores frecuentes y buenas prácticas.</p>
+        <div id="casos-selector-list" class="casos-selector-list"></div>
+      </div>
+    </div>
+    <div id="slides-casos"></div>
+    <div class="slide slide-ruleta ruleta-wrap" id="slide-4">
+      <header class="slide-header slide-6-header">
+        <span class="slide-4-pill slide-4-pill-title">Ruleta de Conocimiento</span>
+      </header>
+      <div class="slide-content slide-4-content">
+        <div id="quiz-ruleta-screen" class="quiz-ruleta-screen">
+          <div class="quiz-ruleta-card">
+            <p class="quiz-ruleta-card-subtitle">Gira y responde una pregunta al azar para reforzar tu conocimiento</p>
+            <div class="quiz-ruleta-circle-wrap">
+              <div class="quiz-ruleta-pointer">♥</div>
+              <div class="quiz-ruleta-circle" id="quiz-ruleta-circle"></div>
+              <div class="quiz-ruleta-center" id="quiz-ruleta-center">Nu</div>
+            </div>
+            <div class="quiz-ruleta-leyenda-wrap">
+              <span class="quiz-ruleta-leyenda-item"><i class="quiz-leyenda-dot" style="background:#e1bee7"></i> Dudas resultado</span>
+              <span class="quiz-ruleta-leyenda-item"><i class="quiz-leyenda-dot" style="background:#f8bbd9"></i> Errores registro</span>
+              <span class="quiz-ruleta-leyenda-item"><i class="quiz-leyenda-dot" style="background:#e1bee7"></i> Prospecto</span>
+            </div>
+            <button type="button" class="quiz-ruleta-btn quiz-girar-btn" id="quiz-girar-btn">Girar Ruleta</button>
+          </div>
+          <p class="quiz-ruleta-instruccion">Da clic para iniciar <span class="quiz-ruleta-arrow">→</span></p>
+        </div>
+        <div id="quiz-question-screen" class="quiz-question-screen" style="display:none;">
+          <div id="quiz-container"></div>
+          <div class="quiz-actions">
+            <button type="button" class="quiz-ruleta-btn" id="quiz-girar-otra-btn">🔄 Girar de nuevo</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-nav">
+    <button type="button" class="slide-nav-btn" id="nav-prev" onclick="goToSlide(currentSlide - 1)">← Anterior</button>
+    <span class="slide-indicator" id="slide-indicator">1 / 4</span>
+    <button type="button" class="slide-nav-btn" id="nav-next" onclick="goToSlide(currentSlide + 1)">Siguiente →</button>
+  </div>
+  <script>
+  window.CASOS_MAL_GESTIONADOS = {
+  "version": "1",
+  "bpo_tiempos_min": { "teleperformance": 20, "konecta": 17 },
+  "contact_reasons": {
+    "teleperformance": ["Dudas sobre el Resultado de Solicitud (Declinado, Cancelado o Erróneo)", "Errores en el flujo de registro"],
+    "konecta": ["Dudas sobre el Resultado de Solicitud (Declinado, Cancelado o Erróneo)", "Registro, aplicación e información de productos Nu (Prospecto)"]
+  },
+  "contact_reasons_definiciones": {},
+  "casos": [
+    {"id":"1","contact_reason":"Dudas sobre el Resultado de Solicitud (Declinado, Cancelado o Erróneo)","bpo_aplica":["teleperformance","konecta"],"audio_llamada":"audio-llamada-dudas-resultado-1.wav","contexto":"Llamada. La cliente cuestiona por qué no ha podido obtener la tarjeta de crédito, mencionando que tiene otros créditos (hipotecario, Falabella). El agente explicó el rechazo citando una supuesta regla del sistema (70% vida crediticia / 30% capacidad de endeudamiento), induciendo la respuesta.","chat":[{"rol":"usuario","texto":"¿Por qué no he podido obtener la tarjeta de crédito? Yo tengo otros créditos, hipotecario, Falabella…"},{"rol":"agente","texto":"El 70% de esa vida crediticia la copa directamente si tú pagas arriendo, vestuario, alimentación... y nos queda el 30% para capacidad de endeudamiento. Por eso el rechazo.","incorrecto":true}],"frases_incorrectas":["El 70% de esa vida crediticia la copa directamente si tú pagas arriendo, vestuario, alimentación... y nos queda el 30% para capacidad de endeudamiento (inducir que el rechazo fue por capacidad de endeudamiento)"],"errores":["Se induce la respuesta: se menciona que el rechazo se dio por capacidad de endeudamiento, atribuyendo una causa específica que no debe afirmarse así al cliente"],"reglas_no_hacer":["Explicar el rechazo atribuyendo una causa concreta (ej. capacidad de endeudamiento, 70/30) como si fuera regla del sistema","Inducir o sugerir al cliente la razón del declinado con porcentajes o fórmulas no oficiales"],"reglas_si_hacer":["Explicar que la oferta depende de la evaluación del perfil sin detallar causas específicas del rechazo","Ofrecer tips generales para el perfil y reforzar que la oferta llegará por app/correo cuando haya producto disponible"],"frases_correctas":["En Nu evaluamos tu perfil para ofrecerte el producto que mejor se ajuste. Por el momento no tenemos una oferta de tarjeta de crédito para ti; cuando la tengamos, la verás en tu app y por correo. No necesitas aplicar de nuevo.","Te comparto algunos tips que ayudan a tu perfil: cumplir pagos a tiempo, mantener cuentas activas. Cuando el sistema tenga una oferta para ti, te notificaremos."],"justificacion_respuesta":"La opción correcta no atribuye una causa concreta al rechazo (evita porcentajes o fórmulas como 70/30), explica que la oferta depende de la evaluación del perfil y comunica que se notificará por app y correo cuando haya oferta disponible, sin inducir al cliente."},
+    {"id":"7","contact_reason":"Dudas sobre el Resultado de Solicitud (Declinado, Cancelado o Erróneo)","bpo_aplica":["teleperformance","konecta"],"audio_llamada":"audio-llamada-dudas-resultado-3.wav","contexto":"Usuario no entiende oferta: indica que se postuló a tarjeta de crédito y no le ha llegado; verificando en el perfil solo se le ofertó cuenta de ahorros. Menciona venta atada; es importante tener presente que la tarjeta débito no va a dar la tarjeta de crédito, los dos productos son totalmente independientes. No se puede indicar algoritmo. No promueve encuesta.","chat":[{"rol":"usuario","texto":"¿Por qué no me aprobaron la tarjeta de crédito?"},{"rol":"agente","texto":"Llevas muy poco con la cuenta. El sistema va a visualizar tus movimientos para la aprobación de la tarjeta de crédito.","incorrecto":true}],"frases_incorrectas":["Llevas muy poco con la cuenta; el sistema va a visualizar tus movimientos para la aprobación de la tarjeta de crédito","Vincular la aprobación de tarjeta de crédito al uso de la cuenta (venta atada)"],"errores":["Demuestra poco conocimiento sobre soft decline: no debe condicionar la oferta de tarjeta de crédito al tiempo o movimientos en la cuenta","Venta atada: condicionar un producto (tarjeta de crédito) al uso de otro (cuenta)"],"reglas_no_hacer":["Decir que el sistema visualizará movimientos para aprobar la tarjeta de crédito o que por llevar poco con la cuenta no hay oferta","Hacer venta atada (vincular aprobación de un producto al uso de otro)"],"reglas_si_hacer":["Explicar soft decline sin condicionar a tiempo ni movimientos: la oferta llega por evaluación del perfil","Comunicar que la oferta se notificará por app/correo cuando esté disponible, sin atar a uso de cuenta"],"frases_correctas":["En Nu evaluamos tu perfil para ofrecerte el producto que mejor se ajuste. Por el momento no tenemos una oferta de tarjeta de crédito para ti; cuando la tengamos, la verás en tu app y por correo. No necesitas aplicar de nuevo."],"justificacion_respuesta":"La opción correcta evita condicionar la tarjeta de crédito al tiempo o a los movimientos en la cuenta, no hace venta atada y alinea con el manejo correcto del soft decline (oferta por perfil, notificación por app/correo)."},
+    {"id":"11","contact_reason":"Dudas sobre el Resultado de Solicitud (Declinado, Cancelado o Erróneo)","bpo_aplica":["teleperformance","konecta"],"audio_llamada":"audio-llamada-dudas-resultado-5.wav","contexto":"Llamada. Le menciona a la cliente que no se preocupe ya que puede notar en el perfil que no cuenta con tags, los cuales indican que podría en un futuro tener tarjeta de crédito. La usuaria indica que quisiera saber si puede cancelar la cuenta de ahorros (estado del PV abandoned); el Xtronaut menciona que puede terminar con el registro para hacer la cancelación y no ayuda a realizar el proceso de opt out. Le indica que una vez cancelada la solicitud puede realizar nuevamente el proceso de registro para la tarjeta de crédito. La usuaria pregunta si tiene que quedarse con la cuenta de ahorros; el Xtronaut le indica que sí y le menciona los beneficios de la cuenta. Menciona tema de Score y el puntaje que deberían tener, indica que un banco necesita 530 mínimo.","chat":[{"rol":"usuario","texto":"¿Puedo cancelar la cuenta de ahorros? ¿Tengo que quedarme con ella?"},{"rol":"agente","texto":"Puedes terminar con el registro para hacer la cancelación. Una vez cancelada la solicitud puedes realizar nuevamente el proceso de registro para la tarjeta de crédito. En tu perfil no tienes tags, podrías en un futuro tener tarjeta.","incorrecto":true}],"frases_incorrectas":["No orientar sobre opt out cuando el cliente quiere cancelar cuenta de ahorros","Indicar que al cancelar puede volver a registrarse para tarjeta de crédito","Mencionar tags o que en un futuro podría tener tarjeta de crédito según perfil","Citar score o puntaje mínimo de otros bancos (ej. 530)"],"errores":["No ayuda a realizar el proceso de opt out cuando la usuaria quiere cancelar (PV abandoned)","Mencionar tags o señales en perfil como indicio de tarjeta a futuro","Indicar que cancelando puede volver a registrar para tarjeta de crédito","Mencionar score o puntaje mínimo (530) como requisito"],"reglas_no_hacer":["Mencionar tags o que en un futuro podría tener tarjeta de crédito según perfil","No orientar sobre proceso de opt out cuando el cliente quiere cancelar cuenta de ahorros","Indicar que al cancelar puede volver a registrarse para tarjeta de crédito","Citar score o puntaje mínimo de otros bancos (ej. 530)"],"reglas_si_hacer":["Explicar la oferta según evaluación del perfil sin inventar tags ni futuros productos","Orientar sobre opt out según guía cuando aplique (estado PV abandoned)","Comunicar que la oferta se notificará por app/correo cuando esté disponible","No citar scores o puntajes de otros bancos"],"frases_correctas":["En Nu evaluamos tu perfil para ofrecerte el producto que mejor se ajuste. Por el momento no tenemos una oferta de tarjeta de crédito para ti; cuando la tengamos, la verás en tu app y por correo. Si deseas cancelar tu cuenta de ahorros, te explico el proceso de opt out según tu caso."],"justificacion_respuesta":"La respuesta correcta no inventa tags ni futuros productos, orienta sobre opt out cuando la cliente quiere cancelar, no promete volver a registrar para tarjeta y evita citar scores de otros bancos.","multiselect":true},
+    {"id":"6","contact_reason":"Registro, aplicación e información de productos Nu (Prospecto)","bpo_aplica":["konecta"],"audio_llamada":"audio-llamada-registro-prospecto-oferta.wav","contexto":"Situación: Durante la consulta de la usuaria sobre su proceso de registro, indagaba sobre qué producto iba a recibir o cuál era su oferta aprobada. Comportamiento: El agente le mencionó que cuando finalizara el proceso y validara el contrato podría conocer qué oferta le habíamos realizado. Sin embargo, al revisar el caso, el producto ya estaba asignado y visible en sistema. Se omitió la validación en los widgets de soporte clave (Account Request, Prospects o Notification History) donde ya figuraba el estado del prospecto con el producto definido.","chat":[{"rol":"usuario","texto":"¿Qué producto me van a dar? ¿Cuál es mi oferta aprobada?"},{"rol":"agente","texto":"Cuando finalices el proceso y valides el contrato podrás conocer qué oferta te realizamos.","incorrecto":true}],"frases_incorrectas":["Cuando finalices el proceso y valides el contrato podrás conocer qué oferta te realizamos","Al terminar el registro verás tu oferta"],"errores":["No se validó en sistema: el producto ya estaba asignado y visible en Account Request, Prospects o Notification History","Se dio información que retrasa la respuesta cuando la oferta ya estaba definida"],"reglas_no_hacer":["Decir que conocerá la oferta al finalizar/validar el contrato sin antes revisar en widgets (Account Request, Prospects, Notification History)","Omitir la validación en sistema cuando el prospecto pregunta por su producto u oferta"],"reglas_si_hacer":["Revisar en Account Request, Prospects o Notification History el estado del prospecto y el producto definido","Informar con claridad qué producto tiene asignado según lo que figure en sistema"],"frases_correctas":["Revisando en sistema tu proceso: ya tienes [producto] asignado. Te explico los pasos para que lo actives y conozcas tu oferta."],"justificacion_respuesta":"La respuesta correcta implica haber validado en los widgets de soporte (Account Request, Prospects o Notification History) y comunicar al cliente el producto ya asignado, en lugar de diferir la información al cierre del contrato."},
+    {"id":"8","contact_reason":"Errores en el flujo de registro","bpo_aplica":["teleperformance"],"audio_llamada":"audio-llamada-errores-flujo.wav","contexto":"Se escaló el SJ de Reporte de Bugs, sin embargo se menciona al momento de escalarlo que de hoy a mañana le darían respuesta. Esto genera una falsa expectativa, ya que el tiempo máximo de respuesta para esos casos es de 7 días hábiles.","chat":[{"rol":"usuario","texto":"¿Para cuándo me responden sobre el reporte?"},{"rol":"agente","texto":"Ya escalé tu caso. De hoy a mañana te dan respuesta.","incorrecto":true}],"frases_incorrectas":["De hoy a mañana te dan respuesta","Mañana te responden"],"errores":["Genera falsa expectativa: el tiempo máximo de respuesta del SJ Reporte de Bugs es de 7 días hábiles, no \"de hoy a mañana\""],"reglas_no_hacer":["Dar plazos que no corresponden al proceso (ej. \"de hoy a mañana\")","Prometer tiempos de respuesta sin consultar guías o tiempos oficiales del Secondary Job"],"reglas_si_hacer":["Indicar el tiempo real de respuesta según guía (Reporte de Bugs: hasta 7 días hábiles)","No generar expectativas de plazos menores a los establecidos"],"frases_correctas":["Tu caso ya fue escalado al equipo de Reporte de Bugs. El tiempo de respuesta para estos casos es de hasta 7 días hábiles. Te notificaremos cuando tengamos novedades."],"justificacion_respuesta":"La respuesta correcta evita plazos falsos (de hoy a mañana) y comunica el tiempo real de respuesta del SJ Reporte de Bugs: hasta 7 días hábiles."},
+    {"id":"10","contact_reason":"Errores en el flujo de registro","bpo_aplica":["teleperformance"],"audio_llamada":"audio-llamada-errores-flujo-2.wav","contexto":"Usuaria presenta error para culminar su registro; la CR correcta es Errores en el flujo de registro. El Xtronaut no compartió orientación correctamente, no utilizó las herramientas necesarias para la solución y no brindó información correcta: indica que la aprobación se demora 24 a 48 horas y que una vez le brinden la respuesta podrá ver qué producto se le ofertó, cuando en el PV del usuario el agente puede ver qué producto se ofertó. No mantuvo tono Nu (no fue cálidamente interactivo, no enérgico, no culturalmente conectado); es poco empático, parece enojado, no es cálido; la usuaria le indica algo y él sube el tono de voz para que se escuche lo que él dice y no lo que la usuaria quiere decir.","chat":[{"rol":"usuario","texto":"Me aparece un error y no puedo terminar el registro"},{"rol":"agente","texto":"La aprobación se demora de 24 a 48 horas. Una vez te brinden la respuesta podrás ver qué producto se te ofertó.","incorrecto":true}],"frases_incorrectas":["La aprobación se demora de 24 a 48 horas; una vez te brinden la respuesta podrás ver qué producto se te ofertó","No consultar el PV del usuario para ver qué producto se ofertó y orientar con esa información"],"errores":["No compartió orientación correctamente; no utilizó las herramientas necesarias (ej. PV) para la solución","Información incorrecta: indica plazos (24 a 48 h) y que verá el producto cuando le respondan, cuando el agente puede ver en el PV qué producto se ofertó","No mantuvo tono Nu: no cálido, no enérgico, no culturalmente conectado; poco empático, sube el tono en lugar de escuchar a la usuaria"],"reglas_no_hacer":["Dar información sin validar en PV o herramientas (el producto ofertado se puede ver en el PV del usuario)","Decir que verá el producto cuando le respondan sin revisar antes en sistema","Subir el tono de voz o no escuchar a la usuaria; no mantener tono Nu (cálido, enérgico, empático)"],"reglas_si_hacer":["Revisar en PV y herramientas qué producto tiene el usuario y orientar con esa información","Mantener tono Nu: cálido, enérgico, culturalmente conectado, empático","Escuchar a la usuaria y no imponer la voz; dar pasos concretos según guía de Errores en el flujo de registro"],"frases_correctas":["Revisando tu perfil en sistema puedo ver [información del producto/estado]. Te explico los pasos para que puedas culminar tu registro según lo que aplica a tu caso."],"justificacion_respuesta":"La respuesta correcta implica usar las herramientas (PV) para ver qué producto se ofertó y orientar con información real, sin dar plazos genéricos ni diferir la información; además mantener tono Nu y escuchar a la usuaria."}
+  ]
+  };
+  </script>
+  <script>
+  var currentSlide = 1;
+  var totalSlides = 4;
+  function goToSlide(n) {
+    if (n < 1 || n > totalSlides) return;
+    currentSlide = n;
+    document.querySelectorAll('.slide').forEach(function(s) { s.classList.remove('active'); });
+    var el = document.getElementById('slide-' + n);
+    if (el) el.classList.add('active');
+    document.getElementById('slide-indicator').textContent = n + ' / ' + totalSlides;
+    document.getElementById('nav-prev').disabled = (n === 1);
+    document.getElementById('nav-next').disabled = (n === totalSlides);
+    if (n === 3 && window.slide3OpenTab) {
+      setTimeout(function() {
+        if (typeof window.activateSlide3Tab === 'function') window.activateSlide3Tab(window.slide3OpenTab);
+        window.slide3OpenTab = null;
+      }, 50);
+    }
+    if (typeof window.initCallSimForVisibleSlide === 'function') window.initCallSimForVisibleSlide();
+  }
+  document.getElementById('slide-indicator').textContent = '1 / ' + totalSlides;
+  document.getElementById('nav-next').disabled = (currentSlide === totalSlides);
+  document.getElementById('nav-prev').disabled = true;
+  </script>
+  <script>
+(function () {
+  'use strict';
+
+  function getData() {
+    return window.CASOS_MAL_GESTIONADOS || { casos: [] };
+  }
+
+  var data = getData();
+  var casos = data.casos || [];
+  var listEl = document.getElementById('casos-selector-list');
+  var container = document.getElementById('slides-casos');
+  var defs = data.contact_reasons_definiciones || {};
+
+  function esc(s) {
+    var div = document.createElement('div');
+    div.textContent = s;
+    return div.innerHTML;
+  }
+
+  function renderChat(caso) {
+    var chat = caso.chat || [];
+    var ctxText = (caso.contexto || '').replace(/^Situación:\s*/i, '');
+    var html = '<div class="contexto" style="margin-bottom:0.5rem"><span class="contexto-label"><span class="contexto-icon">📋</span> Contexto</span><p style="margin:0;">' + esc(ctxText) + '</p></div>';
+    html += '<ul class="chat-thread">';
+    for (var i = 0; i < chat.length; i++) {
+      var msg = chat[i];
+      var cls = msg.rol === 'usuario' ? 'usuario' : 'agente';
+      var rolNombre = msg.rol === 'usuario' ? 'Usuario' : 'Equipo Nu';
+      var bubbleCls = 'bubble' + (msg.incorrecto ? ' incorrecto' : '');
+      html += '<li class="chat-msg ' + cls + (msg.incorrecto ? ' incorrecto' : '') + '"><div><div class="rol">' + esc(rolNombre) + '</div><div class="bubble ' + bubbleCls + '">' + esc(msg.texto || '') + '</div>';
+      if (msg.incorrecto) html += '<div class="incorrecto-tag">⚠ Respuesta incorrecta</div>';
+      html += '</div></li>';
+    }
+    html += '</ul>';
+    return html;
+  }
+
+  function renderCaso(caso, index) {
+    var frasesInc = caso.frases_incorrectas || (caso.frase_incorrecta ? [caso.frase_incorrecta] : []);
+    var html = '<section><h2>' + esc(caso.contact_reason) + '</h2><span class="caso-badge">Caso #' + (index + 1) + '</span>';
+    if (caso.errores && caso.errores[0]) {
+      html += '<div class="caso-clave"><strong>Aprendizaje clave</strong>' + esc(caso.errores[0]) + '</div>';
+    }
+    if (caso.chat && caso.chat.length) {
+      html += renderChat(caso);
+    } else {
+      html += '<div class="contexto"><span class="contexto-label"><span class="contexto-icon">📋</span> Contexto</span><p style="margin:0;">' + esc((caso.contexto || '').replace(/^Situación:\s*/i, '')) + '</p></div>';
+      if (frasesInc.length) {
+        html += '<div class="wrong-box"><div class="label">Qué se dijo mal</div>';
+        for (var fi = 0; fi < frasesInc.length; fi++) { html += '<blockquote>"' + esc(frasesInc[fi]) + '"</blockquote>'; }
+        html += '</div>';
+      }
+    }
+    if (frasesInc.length && (caso.chat && caso.chat.length)) {
+      html += '<div class="wrong-box"><div class="label">Frases que no se deben decir</div>';
+      for (var f = 0; f < frasesInc.length; f++) { html += '<blockquote>"' + esc(frasesInc[f]) + '"</blockquote>'; }
+      html += '</div>';
+    }
+    if (caso.errores && caso.errores.length) {
+      html += '<div class="why-wrong"><div class="label">Por qué está mal</div><ul>';
+      for (var e = 0; e < caso.errores.length; e++) { html += '<li>' + esc(caso.errores[e]) + '</li>'; }
+      html += '</ul></div>';
+    }
+    if (caso.frases_correctas && caso.frases_correctas.length) {
+      html += '<div class="phrases" style="margin-top:1.25rem"><div class="label">Frases sugeridas (correctas)</div><ul>';
+      for (var fc = 0; fc < caso.frases_correctas.length; fc++) { html += '<li>"' + esc(caso.frases_correctas[fc]) + '"</li>'; }
+      html += '</ul></div>';
+    }
+    html += '</section>';
+    return html;
+  }
+
+  function shuffleArr(arr) {
+    var copy = arr.slice();
+    for (var i = copy.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = copy[i];
+      copy[i] = copy[j];
+      copy[j] = t;
+    }
+    return copy;
+  }
+
+  var CR_DUDAS_RESULTADO = 'Dudas sobre el Resultado de Solicitud (Declinado, Cancelado o Erróneo)';
+
+  function renderCasoRefuerzo(caso) {
+    var frasesInc = caso.frases_incorrectas || [];
+    var html = '';
+    if (frasesInc.length) {
+      html += '<div class="wrong-box"><div class="label">Frases que no se deben decir</div>';
+      for (var f = 0; f < frasesInc.length; f++) { html += '<blockquote>"' + esc(frasesInc[f]) + '"</blockquote>'; }
+      html += '</div>';
+    }
+    if (caso.errores && caso.errores.length) {
+      html += '<div class="why-wrong"><div class="label">Por qué está mal</div><ul>';
+      for (var e = 0; e < caso.errores.length; e++) { html += '<li>' + esc(caso.errores[e]) + '</li>'; }
+      html += '</ul></div>';
+    }
+    if (caso.frases_correctas && caso.frases_correctas.length) {
+      html += '<div class="phrases" style="margin-top:1.25rem"><div class="label">Frases sugeridas (correctas)</div><ul>';
+      for (var fc = 0; fc < caso.frases_correctas.length; fc++) { html += '<li>"' + esc(caso.frases_correctas[fc]) + '"</li>'; }
+      html += '</ul></div>';
+    }
+    return html;
+  }
+
+  var crToWeduka = {
+    'Dudas sobre el Resultado de Solicitud (Declinado, Cancelado o Erróneo)': { url: 'https://nucolombia.myweduka.com/DocumentFind/Document?idDocument=4620', seccion: 'Dudas sobre el Resultado de Solicitud' },
+    'Errores en el flujo de registro': { url: 'https://nucolombia.myweduka.com/DocumentFind/Document?idDocument=4622', seccion: 'Errores en el flujo de registro' },
+    'Registro, aplicación e información de productos Nu (Prospecto)': { url: 'https://nucolombia.myweduka.com/DocumentFind/Document?idDocument=4610', seccion: 'Registro e información de productos (Prospecto)' }
+  };
+  function getWedukaUrl(caso) {
+    if (!caso || !caso.contact_reason) return '';
+    var info = crToWeduka[caso.contact_reason];
+    return (info && info.url) ? info.url : '';
+  }
+
+  function getCallSimHtml(casoIdx, caso) {
+    var refuerzoHtml = (caso && renderCasoRefuerzo(caso)) || '';
+    var ctx = (caso && caso.contexto) ? (caso.contexto || '').replace(/^Situación:\s*/i, '') : '';
+    var wedukaInfo = (caso && crToWeduka[caso.contact_reason]) ? crToWeduka[caso.contact_reason] : { url: 'https://nucolombia.myweduka.com/', seccion: 'Guía Contact Reasons' };
+    var sid = casoIdx;
+    var wedukaLink = '<a href="' + esc(wedukaInfo.url) + '" target="_blank" rel="noopener" class="call-sim-btn-otra" id="call-sim-btn-otra-' + sid + '" style="display:none;">Weduka: ' + esc(wedukaInfo.seccion) + '</a>';
+    var html = '<section class="call-sim-en-casos" data-caso-idx="' + casoIdx + '">';
+    html += '<h3 class="call-sim-en-casos-title">📞 Simulación de llamada</h3><p class="call-sim-en-casos-desc">Escucha la llamada como si fuera real. Al terminar, marca qué estuvo mal.</p>';
+    if (ctx) html += '<div class="call-sim-contexto-visible"><span class="contexto-label"><span class="contexto-icon">📋</span> Contexto</span><p style="margin:0;">' + esc(ctx) + '</p></div>';
+    html += '<div id="call-sim-start-' + sid + '" class="call-sim-start"><button type="button" class="call-sim-btn-iniciar" id="call-sim-btn-iniciar-' + sid + '">Recibir llamada</button></div>';
+    html += '<div id="call-sim-scenario-' + sid + '" class="call-sim-scenario" style="display:none;">';
+    html += '<div class="call-sim-incoming call-sim-live"><span class="call-sim-pulse"></span>Llamada en curso</div>';
+    html += '<p class="call-sim-contexto-line" id="call-sim-contexto-' + sid + '" style="display:none;"></p>';
+    html += '<audio id="call-sim-ring-audio-' + sid + '" preload="auto"></audio>';
+    html += '<div class="call-sim-player-bar" id="call-sim-player-bar-' + sid + '"><button type="button" class="call-sim-player-btn" id="call-sim-player-play-' + sid + '" title="Reproducir / Pausar">▶</button><span class="call-sim-player-time" id="call-sim-player-time-' + sid + '">0:00 / 0:00</span><input type="range" class="call-sim-player-range" id="call-sim-player-range-' + sid + '" min="0" max="100" value="0"><button type="button" class="call-sim-skip-btn" id="call-sim-skip-15-' + sid + '">+15 s</button><button type="button" class="call-sim-skip-btn" id="call-sim-skip-30-' + sid + '">+30 s</button><span class="call-sim-player-vol">🔊</span></div>';
+    html += '<div id="call-sim-tts-wrap-' + sid + '" class="call-sim-tts-wrap" style="margin-top:12px;"><button type="button" class="call-sim-btn-tts" id="call-sim-btn-tts-' + sid + '">🔊 Escuchar conversación (voz)</button><span class="call-sim-tts-hint" style="display:none;font-size:0.85rem;color:var(--gray-600);margin-left:8px;"></span></div>';
+    html += '<div class="call-sim-question-wrap" id="call-sim-question-wrap-' + sid + '"><p class="call-sim-pregunta">Selecciona la respuesta correcta que debería haber dado el agente:</p><p class="call-sim-una-respuesta">Solo una respuesta es correcta.</p><div id="call-sim-opciones-' + sid + '" class="call-sim-opciones-errores"></div><button type="button" class="call-sim-btn-ver-resultado" id="call-sim-btn-ver-resultado-' + sid + '">Ver resultado</button></div>';
+    html += '<div id="call-sim-feedback-' + sid + '" class="call-sim-feedback" style="display:none;"></div><div class="call-sim-actions">' + wedukaLink + '</div></div>';
+    if (refuerzoHtml) html += '<div class="call-sim-refuerzo">' + refuerzoHtml + '</div>';
+    html += '</section>';
+    return html;
+  }
+
+  function buildCaseSlides(selectedIndices) {
+    if (!container) return;
+    var ruletaEl = document.getElementById('slide-4');
+    if (ruletaEl) ruletaEl.id = 'slide-' + (4 + selectedIndices.length);
+    container.innerHTML = '';
+    for (var pos = 0; pos < selectedIndices.length; pos++) {
+      var idx = selectedIndices[pos];
+      var c = casos[idx];
+      if (!c) continue;
+      var slideNum = 4 + pos;
+      var titulo = (c.contact_reason && c.contact_reason.length > 50) ? 'Caso ' + (pos + 1) : (c.contact_reason || 'Caso ' + (pos + 1));
+      var casoContent = (c.audio_llamada || c.contact_reason === CR_DUDAS_RESULTADO) ? getCallSimHtml(idx, c) : renderCaso(c, idx);
+      var wedukaInfo = (c && crToWeduka[c.contact_reason]) ? crToWeduka[c.contact_reason] : { url: 'https://nucolombia.myweduka.com/', seccion: 'Guía Contact Reasons' };
+      var wedukaBtnHtml = wedukaInfo.url ? '<div class="caso-weduka-footer"><a href="' + esc(wedukaInfo.url) + '" target="_blank" rel="noopener" class="caso-btn-weduka"><span class="caso-btn-weduka-icon">📚</span> Consultar proceso en Weduka: ' + esc(wedukaInfo.seccion) + '</a></div>' : '';
+      var nextSlideNum = 4 + pos + 1;
+      var siguienteLabel = (pos + 1 < selectedIndices.length) ? 'Siguiente caso' : 'Ir a Ruleta de Conocimiento';
+      var siguienteBtnHtml = '<div class="caso-siguiente-wrap"><button type="button" class="caso-btn-siguiente" onclick="window.goToSlide && window.goToSlide(' + nextSlideNum + ')">' + esc(siguienteLabel) + '</button></div>';
+      var slideHtml = '<div class="slide slide-caso" id="slide-' + slideNum + '"><header class="slide-header"><h1>' + esc(titulo) + '</h1><p class="subtitle">Caso ' + (pos + 1) + ' de ' + selectedIndices.length + '</p></header><div class="slide-content">' + casoContent + wedukaBtnHtml + siguienteBtnHtml + '</div></div>';
+      container.insertAdjacentHTML('beforeend', slideHtml);
+    }
+    totalSlides = 4 + selectedIndices.length;
+    document.getElementById('slide-indicator').textContent = currentSlide + ' / ' + totalSlides;
+    document.getElementById('nav-prev').disabled = false;
+    document.getElementById('nav-next').disabled = (currentSlide === totalSlides);
+  }
+
+  function updateSelectionSummary() {
+    var summaryEl = document.querySelector('.selection-summary');
+    if (!summaryEl) return;
+    var selected = getSelectedIndices();
+    summaryEl.textContent = selected.length + ' de ' + casos.length + ' caso(s) seleccionado(s)';
+  }
+
+  function getSelectedIndices() {
+    if (!listEl) return [];
+    var checkboxes = listEl.querySelectorAll('input.caso-cb');
+    var indices = [];
+    for (var i = 0; i < checkboxes.length; i++) {
+      if (checkboxes[i].checked) {
+        var idx = parseInt(checkboxes[i].getAttribute('data-idx') || checkboxes[i].value, 10);
+        if (!isNaN(idx)) indices.push(idx);
+      }
+    }
+    return indices;
+  }
+
+  var TAB_ORDER = [
+    'Dudas sobre el Resultado de Solicitud (Declinado, Cancelado o Erróneo)',
+    'Registro, aplicación e información de productos Nu (Prospecto)',
+    'Errores en el flujo de registro'
+  ];
+  var TAB_LABELS = { 'Dudas sobre el Resultado de Solicitud (Declinado, Cancelado o Erróneo)': 'Dudas resultado', 'Registro, aplicación e información de productos Nu (Prospecto)': 'Registro / Prospecto', 'Errores en el flujo de registro': 'Errores en el flujo' };
+
+  if (listEl && casos.length) {
+    var byReason = {};
+    for (var i = 0; i < casos.length; i++) {
+      var cr = casos[i].contact_reason || 'Sin categor\u00eda';
+      if (!byReason[cr]) byReason[cr] = [];
+      byReason[cr].push({ idx: i, caso: casos[i] });
+    }
+    var tabsNavHtml = '<div class="casos-tabs-nav">';
+    var tabsPanelsHtml = '<div class="casos-tabs-panels">';
+    for (var k = 0; k < TAB_ORDER.length; k++) {
+      var reason = TAB_ORDER[k];
+      var group = byReason[reason];
+      if (!group || group.length === 0) continue;
+      var tabId = 'tab-' + k;
+      var panelId = 'panel-' + k;
+      var crAttr = esc(reason).replace(/"/g, '&quot;');
+      tabsNavHtml += '<button type="button" class="casos-tab-btn' + (k === 0 ? ' active' : '') + '" data-cr="' + crAttr + '" id="' + tabId + '" aria-selected="' + (k === 0 ? 'true' : 'false') + '" aria-controls="' + panelId + '">' + esc(TAB_LABELS[reason] || reason) + '</button>';
+      var groupHtml = '<div class="cr-group"><div class="cr-group-title">' + esc(reason) + '</div><div class="cr-group-casos">';
+      for (var g = 0; g < group.length; g++) {
+        var item = group[g];
+        var idx = item.idx;
+        var caso = item.caso;
+        var ctx = (caso.contexto || '').replace(/^Situación:\s*/i, '');
+        var enfoque = (caso.errores && caso.errores[0]) ? caso.errores[0] : '';
+        var num = idx + 1;
+        groupHtml += '<label for="caso-cb-' + idx + '"><input type="checkbox" class="caso-cb" data-idx="' + idx + '" id="caso-cb-' + idx + '"><span class="case-check"><span class="check-icon">✓</span></span><span class="case-num">' + num + '</span><div class="case-label-wrap"><span class="case-title">Caso ' + num + '</span>' + (ctx ? '<span class="case-context">' + esc(ctx) + '</span>' : '') + (enfoque ? '<span class="case-enfoque">Refuerzo: ' + esc(enfoque) + '</span>' : '') + '</div></label>';
+      }
+      groupHtml += '</div></div>';
+      tabsPanelsHtml += '<div class="casos-tab-panel' + (k === 0 ? ' active' : '') + '" id="' + panelId + '" role="tabpanel" data-cr="' + crAttr + '" aria-labelledby="' + tabId + '">' + groupHtml + '</div>';
+    }
+    tabsNavHtml += '</div>';
+    tabsPanelsHtml += '</div>';
+    listEl.innerHTML = '<div class="casos-tabs">' + tabsNavHtml + tabsPanelsHtml + '</div>';
+    listEl.querySelectorAll('.casos-tab-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var cr = btn.getAttribute('data-cr');
+        if (typeof window.activateSlide3Tab === 'function') window.activateSlide3Tab(cr);
+      });
+    });
+    listEl.addEventListener('change', updateSelectionSummary);
+    listEl.addEventListener('click', function (ev) {
+      var label = ev.target.closest('label');
+      if (!label || !listEl.contains(label)) return;
+      if (ev.target.type === 'checkbox') return;
+      ev.preventDefault();
+      var cb = label.querySelector('.caso-cb');
+      if (!cb) return;
+      var idxVal = parseInt(cb.getAttribute('data-idx'), 10);
+      if (isNaN(idxVal)) return;
+      buildCaseSlides([idxVal]);
+      if (typeof goToSlide === 'function') goToSlide(4);
+    });
+    window.activateSlide3Tab = function (cr) {
+      if (!listEl) return;
+      var btns = listEl.querySelectorAll('.casos-tab-btn');
+      var panels = listEl.querySelectorAll('.casos-tab-panel');
+      for (var b = 0; b < btns.length; b++) {
+        var isActive = (btns[b].getAttribute('data-cr') === cr);
+        btns[b].classList.toggle('active', isActive);
+        btns[b].setAttribute('aria-selected', isActive ? 'true' : 'false');
+      }
+      for (var p = 0; p < panels.length; p++) {
+        panels[p].classList.toggle('active', panels[p].getAttribute('data-cr') === cr);
+      }
+    };
+    if (window.slide3OpenTab) {
+      window.activateSlide3Tab(window.slide3OpenTab);
+      window.slide3OpenTab = null;
+    }
+    updateSelectionSummary();
+  }
+
+  function renderDefiniciones() {
+    if (!defs || Object.keys(defs).length === 0) return;
+    var slide2 = document.getElementById('slide-2-cr-content');
+    var slide3 = document.getElementById('slide-3-cr-content');
+    var slide4 = document.getElementById('slide-4-cr-content');
+    var targets = [slide2, slide3, slide4].filter(Boolean);
+    var keys = Object.keys(defs);
+    for (var t = 0; t < targets.length && t < keys.length; t++) {
+      targets[t].innerHTML = '<div class="cr-def">' + esc(defs[keys[t]] || '') + '</div>';
+    }
+  }
+
+  var casosConChat = casos.filter(function (c) {
+    return c.chat && c.chat.length && c.errores && c.errores.length;
+  });
+
+  // --- Call sim state (per-section elements resolved at init)
+  var callSimStart, callSimScenario, callSimOpciones, callSimFeedback, callSimBtnOtra, callSimBtnVerResultado;
+  var callSimCasoActual = null;
+  var callSimRingAudio = null;
+  var callSimMessagesEl, callSimContextoEl, callSimQuestionWrap;
+  var _audioCtx = null;
+
+  function getAudioCtx() {
+    if (!_audioCtx) {
+      _audioCtx = (typeof AudioContext !== 'undefined' ? new AudioContext() : (typeof webkitAudioContext !== 'undefined' ? new webkitAudioContext() : null));
+    }
+    return _audioCtx;
+  }
+
+  function getRingAudioUrl(caso) {
+    return (caso && caso.ring_audio_url) ? caso.ring_audio_url : '';
+  }
+
+  function playRingTone(caso, onEnd) {
+    var url = getRingAudioUrl(caso);
+    if (url) {
+      var audio = new Audio(url);
+      audio.onended = function () {
+        if (onEnd) onEnd();
+      };
+      audio.onerror = function () {
+        if (onEnd) onEnd();
+      };
+      audio.play().catch(function () {
+        if (onEnd) onEnd();
+      });
+      return;
+    }
+    var ctx = getAudioCtx();
+    if (ctx) {
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = 800;
+      osc.type = 'sine';
+      gain.gain.value = 0.1;
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 2);
+      setTimeout(function () {
+        if (onEnd) onEnd();
+      }, 2500);
+    } else {
+      setTimeout(function () {
+        if (onEnd) onEnd();
+      }, 2500);
+    }
+  }
+
+  function getSpanishVoice() {
+    var voices = (typeof speechSynthesis !== 'undefined' && speechSynthesis.getVoices) ? speechSynthesis.getVoices() : [];
+    for (var v = 0; v < voices.length; v++) {
+      if (voices[v].lang && voices[v].lang.indexOf('es') === 0) return voices[v];
+    }
+    return voices[0] || null;
+  }
+
+  function playConversationTTS(caso, btnEl) {
+    if (!caso || !caso.chat || !caso.chat.length) return;
+    if (typeof speechSynthesis === 'undefined') return;
+    speechSynthesis.cancel();
+    if (btnEl) { btnEl.disabled = true; btnEl.textContent = '⏸ Reproduciendo…'; }
+    var voice = getSpanishVoice();
+    var idx = 0;
+    function speakNext() {
+      if (idx >= caso.chat.length) {
+        if (btnEl) { btnEl.disabled = false; btnEl.textContent = '🔊 Escuchar conversación (voz)'; }
+        return;
+      }
+      var msg = caso.chat[idx];
+      var u = new SpeechSynthesisUtterance(msg.texto || '');
+      u.lang = 'es-CO';
+      if (voice) u.voice = voice;
+      u.rate = 0.95;
+      u.onend = function () { idx++; setTimeout(speakNext, 400); };
+      u.onerror = function () { idx++; setTimeout(speakNext, 300); };
+      speechSynthesis.speak(u);
+    }
+    if (speechSynthesis.getVoices().length === 0) {
+      speechSynthesis.onvoiceschanged = function () { voice = getSpanishVoice(); speakNext(); };
+    } else {
+      speakNext();
+    }
+  }
+
+  function showCallSimScenario(casoFijo) {
+    if (callSimStart) { callSimStart.style.display = 'none'; callSimStart.classList.add('hidden'); }
+    if (callSimScenario) { callSimScenario.style.display = 'block'; callSimScenario.classList.remove('hidden'); }
+    if (callSimQuestionWrap) { callSimQuestionWrap.style.display = 'none'; }
+    callSimCasoActual = casoFijo;
+    if (callSimContextoEl) callSimContextoEl.innerHTML = esc(casoFijo.contexto || '');
+    if (callSimMessagesEl) callSimMessagesEl.style.display = 'none';
+    var sectionForTts = callSimScenario && callSimScenario.closest ? callSimScenario.closest('section') : null;
+    var ttsWrap = sectionForTts ? sectionForTts.querySelector('.call-sim-tts-wrap') : null;
+    if (ttsWrap) ttsWrap.style.display = 'none';
+    if (callSimRingAudio && casoFijo.audio_llamada) {
+      callSimRingAudio.src = casoFijo.audio_llamada;
+      callSimRingAudio.onerror = function () {};
+      callSimRingAudio.load();
+    }
+    (function onRingDone() {
+      if (callSimQuestionWrap) { callSimQuestionWrap.style.display = 'block'; callSimQuestionWrap.classList.remove('hidden'); }
+      var opts = [];
+      var correctas = casoFijo.frases_correctas || [];
+      var incorrectas;
+      if (casoFijo.multiselect || casoFijo.id === '11') {
+        incorrectas = (casoFijo.frases_incorrectas || []).slice(0, 4);
+      } else {
+        incorrectas = (casoFijo.frases_incorrectas || []).concat((casoFijo.reglas_no_hacer || []).map(function (r) { return typeof r === 'string' ? r : (r && r.texto); }));
+      }
+      incorrectas = incorrectas.filter(Boolean);
+      if (correctas[0]) opts.push({ text: correctas[0], correcta: true });
+      for (var i = 0; i < incorrectas.length; i++) {
+        opts.push({ text: incorrectas[i], correcta: false });
+      }
+      opts = shuffleArr(opts);
+      if (callSimOpciones) {
+        callSimOpciones.innerHTML = opts.map(function (o, i) {
+          return '<label><input type="radio" name="call-sim-opcion" value="' + i + '" data-correcta="' + (o.correcta ? '1' : '0') + '"> ' + esc(o.text) + '</label>';
+        }).join('');
+      }
+    })();
+  }
+
+  function verResultadoCallSim() {
+    if (!callSimCasoActual) return;
+    var opcionesEl = callSimOpciones || (document.querySelector('.slide.active .call-sim-opciones-errores'));
+    var selected = opcionesEl ? opcionesEl.querySelector('input[name="call-sim-opcion"]:checked') : null;
+    var feedbackEl = callSimFeedback || (document.querySelector('.slide.active .call-sim-feedback'));
+    var btnVer = callSimBtnVerResultado || (document.querySelector('.slide.active .call-sim-btn-ver-resultado'));
+    var btnOtra = callSimBtnOtra || (document.querySelector('.slide.active .call-sim-btn-otra'));
+    var correctaTexto = (callSimCasoActual.frases_correctas && callSimCasoActual.frases_correctas[0]) ? callSimCasoActual.frases_correctas[0] : 'Revisa la guía en Weduka.';
+    if (!feedbackEl) return;
+    feedbackEl.style.display = 'block';
+    feedbackEl.classList.remove('hidden');
+    if (!selected) {
+      feedbackEl.className = 'call-sim-feedback error';
+      feedbackEl.innerHTML = '<strong>Selecciona una opción</strong> antes de ver el resultado. La respuesta correcta es: <em>' + esc(correctaTexto) + '</em>';
+      return;
+    }
+    var isCorrect = selected.getAttribute('data-correcta') === '1';
+    feedbackEl.className = 'call-sim-feedback ' + (isCorrect ? 'ok' : 'error');
+    if (isCorrect) {
+      feedbackEl.innerHTML = '<strong>✓ Correcto.</strong> Es la respuesta adecuada según la guía.';
+    } else {
+      feedbackEl.innerHTML = '<strong>Incorrecto.</strong> La respuesta correcta es: <br><em>' + esc(correctaTexto) + '</em>';
+    }
+    if (opcionesEl) {
+      var radios = opcionesEl.querySelectorAll('input[type="radio"]');
+      for (var r = 0; r < radios.length; r++) radios[r].disabled = true;
+      var labels = opcionesEl.querySelectorAll('label');
+      labels.forEach(function (l) {
+        var isCorrecta = l.querySelector('input[type="radio"]') && l.querySelector('input[type="radio"]').getAttribute('data-correcta') === '1';
+        if (isCorrecta) l.classList.add('correcta-seleccion');
+        else if (l.contains(selected)) l.classList.add('error-seleccion');
+      });
+    }
+    if (btnVer) btnVer.disabled = true;
+    if (btnOtra) { btnOtra.style.display = 'inline-block'; btnOtra.classList.remove('hidden'); }
+  }
+
+  function formatTime(sec) {
+    if (!isFinite(sec) || sec < 0) return '0:00';
+    var m = Math.floor(sec / 60);
+    var s = Math.floor(sec % 60);
+    return m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  function initCallSimPlayerBar(sectionEl, casoIdx) {
+    var sid = casoIdx;
+    var bar = sectionEl && (sectionEl.querySelector('.call-sim-player-bar') || sectionEl.querySelector('#call-sim-player-bar-' + sid));
+    if (!bar) return;
+    var playBtn = bar.querySelector('.call-sim-player-btn') || bar.querySelector('#call-sim-player-play-' + sid);
+    var timeEl = bar.querySelector('.call-sim-player-time') || bar.querySelector('#call-sim-player-time-' + sid);
+    var rangeEl = bar.querySelector('.call-sim-player-range') || bar.querySelector('#call-sim-player-range-' + sid);
+    var audioEl = sectionEl.querySelector('audio');
+    if (!audioEl || !playBtn || !timeEl || !rangeEl) return;
+    function updateTime() {
+      var cur = audioEl.currentTime;
+      var dur = audioEl.duration;
+      if (dur && isFinite(dur)) {
+        timeEl.textContent = formatTime(cur) + ' / ' + formatTime(dur);
+        rangeEl.value = dur > 0 ? Math.round((cur / dur) * 100) : 0;
+      } else {
+        timeEl.textContent = formatTime(cur) + ' / 0:00';
+        rangeEl.value = 0;
+      }
+    }
+    audioEl.addEventListener('timeupdate', updateTime);
+    audioEl.addEventListener('loadedmetadata', updateTime);
+    audioEl.addEventListener('ended', updateTime);
+    playBtn.onclick = function () {
+      if (audioEl.paused) {
+        audioEl.play().catch(function () {});
+      } else {
+        audioEl.pause();
+      }
+    };
+    audioEl.addEventListener('play', function () { playBtn.textContent = '❚❚'; });
+    audioEl.addEventListener('pause', function () { playBtn.textContent = '▶'; });
+    rangeEl.oninput = function () {
+      var pct = parseInt(rangeEl.value, 10) / 100;
+      if (audioEl.duration && isFinite(audioEl.duration)) {
+        audioEl.currentTime = pct * audioEl.duration;
+      }
+    };
+    var skip15 = bar.querySelector('#call-sim-skip-15-' + sid);
+    var skip30 = bar.querySelector('#call-sim-skip-30-' + sid);
+    if (skip15) skip15.onclick = function () {
+      if (audioEl.duration && isFinite(audioEl.duration)) {
+        audioEl.currentTime = Math.min(audioEl.currentTime + 15, audioEl.duration - 0.1);
+        updateTime();
+      }
+    };
+    if (skip30) skip30.onclick = function () {
+      if (audioEl.duration && isFinite(audioEl.duration)) {
+        audioEl.currentTime = Math.min(audioEl.currentTime + 30, audioEl.duration - 0.1);
+        updateTime();
+      }
+    };
+  }
+
+  function initCallSimInCase(sectionEl, caso, casoIdx) {
+    var sid = casoIdx;
+    callSimStart = sectionEl.querySelector('#call-sim-start-' + sid) || sectionEl.querySelector('.call-sim-start');
+    callSimScenario = sectionEl.querySelector('#call-sim-scenario-' + sid) || sectionEl.querySelector('.call-sim-scenario');
+    callSimOpciones = sectionEl.querySelector('#call-sim-opciones-' + sid) || sectionEl.querySelector('.opciones');
+    callSimFeedback = sectionEl.querySelector('#call-sim-feedback-' + sid) || sectionEl.querySelector('.feedback');
+    callSimBtnOtra = sectionEl.querySelector('#call-sim-btn-otra-' + sid) || sectionEl.querySelector('.call-sim-btn-otra');
+    callSimBtnVerResultado = sectionEl.querySelector('#call-sim-btn-ver-resultado-' + sid) || sectionEl.querySelector('.call-sim-btn-ver-resultado');
+    callSimContextoEl = sectionEl.querySelector('#call-sim-contexto-' + sid) || sectionEl.querySelector('.contexto');
+    callSimQuestionWrap = sectionEl.querySelector('#call-sim-question-wrap-' + sid) || sectionEl.querySelector('.question-wrap');
+    callSimMessagesEl = sectionEl.querySelector('#call-sim-messages-' + sid) || sectionEl.querySelector('.chat-thread');
+    callSimRingAudio = sectionEl.querySelector('#call-sim-ring-audio-' + sid) || sectionEl.querySelector('audio');
+    callSimCasoActual = caso;
+
+    var btnIniciar = sectionEl.querySelector('#call-sim-btn-iniciar-' + sid) || sectionEl.querySelector('.call-sim-btn-iniciar');
+    if (btnIniciar) {
+      btnIniciar.onclick = function () {
+        showCallSimScenario(caso);
+      };
+    }
+    if (callSimBtnVerResultado) {
+      callSimBtnVerResultado.onclick = verResultadoCallSim;
+    }
+    initCallSimPlayerBar(sectionEl, casoIdx);
+  }
+
+  window.initCallSimForVisibleSlide = function () {
+    var activeSlide = document.querySelector('.slide.active');
+    if (!activeSlide) return;
+    var sim = activeSlide.querySelector('.call-sim-en-casos');
+    if (!sim) return;
+    var casoIdx = parseInt(sim.getAttribute('data-caso-idx'), 10);
+    if (isNaN(casoIdx) || !casos[casoIdx]) return;
+    initCallSimInCase(sim, casos[casoIdx], casoIdx);
+  };
+
+  // --- Ruleta
+  function buildOneQuestion(casoIdx) {
+    var c = casos[casoIdx];
+    if (!c) return '';
+    var opciones = [];
+    var correctIdx = 0;
+    var label = 'Selecciona la opci\u00f3n correcta';
+    var contextoHtml = c.contexto ? '<div class="quiz-contexto"><strong>Contexto:</strong> ' + esc(c.contexto.substring(0, 350)) + (c.contexto.length > 350 ? '…' : '') + '</div>' : '';
+    var distractorCr = ['Solicitud de Información', 'Reclamos', 'Errores en la app', 'Otro'];
+    var tiposUsables = [];
+    if (c.contact_reason) tiposUsables.push('contact_reason');
+    if (c.frases_correctas && c.frases_correctas.length && (c.frases_incorrectas || c.reglas_no_hacer || []).length) tiposUsables.push('respuesta');
+    if (c.reglas_si_hacer && c.reglas_si_hacer.length && c.reglas_no_hacer && c.reglas_no_hacer.length) tiposUsables.push('si_hacer');
+    if (c.errores && c.errores.length) tiposUsables.push('error');
+    if (tiposUsables.length === 0) tiposUsables = ['contact_reason'];
+    var tipo = tiposUsables[Math.floor(Math.random() * tiposUsables.length)];
+    if (tipo === 'contact_reason') {
+      opciones = [c.contact_reason].concat(distractorCr.filter(function (x) { return x !== c.contact_reason; }).slice(0, 3));
+      opciones = shuffleArr(opciones);
+      correctIdx = opciones.indexOf(c.contact_reason);
+      label = '\u00bfCu\u00e1l es el Contact Reason de este caso?';
+    } else if (tipo === 'respuesta') {
+      var correcta = c.frases_correctas[0];
+      var incorrectas = (c.frases_incorrectas || []).slice(0, 2).concat((c.reglas_no_hacer || []).slice(0, 2).map(function (r) { return typeof r === 'string' ? r : (r && r.texto) || ''; })).filter(Boolean).slice(0, 3);
+      opciones = [correcta].concat(incorrectas.length ? incorrectas : ['Revisar guía en Weduka.', 'No dar plazos sin validar.', 'Inducir la respuesta al cliente.']);
+      opciones = shuffleArr(opciones);
+      correctIdx = opciones.indexOf(correcta);
+      label = '\u00bfCu\u00e1l es la respuesta correcta que debes dar?';
+    } else if (tipo === 'si_hacer') {
+      var siHacer = c.reglas_si_hacer[0];
+      var noHacer = (c.reglas_no_hacer || []).slice(0, 3).map(function (r) { return typeof r === 'string' ? r : (r && r.texto) || ''; }).filter(Boolean);
+      opciones = [siHacer].concat(noHacer.length ? noHacer : ['Omitir validación en sistema.', 'Dar plazos sin consultar guía.']);
+      opciones = shuffleArr(opciones);
+      correctIdx = opciones.indexOf(siHacer);
+      label = '\u00bfQu\u00e9 S\u00cd debes hacer en este caso?';
+    } else if (tipo === 'error') {
+      var errCorrecto = c.errores[0];
+      var otros = ['Cumplir tiempos de respuesta.', 'Ofrecer escalamiento cuando aplique.', 'Indagar la necesidad del cliente.'];
+      opciones = [errCorrecto].concat(otros);
+      opciones = shuffleArr(opciones);
+      correctIdx = opciones.indexOf(errCorrecto);
+      label = '\u00bfCu\u00e1l es el error principal en este caso?';
+    } else {
+      opciones = [c.contact_reason].concat(distractorCr.filter(function (x) { return x !== c.contact_reason; }).slice(0, 3));
+      opciones = shuffleArr(opciones);
+      correctIdx = opciones.indexOf(c.contact_reason);
+      label = '\u00bfCu\u00e1l es el Contact Reason?';
+    }
+    var optsHtml = opciones.map(function (opt, i) {
+      var texto = (opt && opt.length > 120) ? opt.substring(0, 120) + '…' : (opt || '');
+      return '<button type="button" class="quiz-opcion" data-idx="' + i + '">' + esc(texto) + '</button>';
+    }).join('');
+    var correctAnswerText = opciones[correctIdx] || '';
+    var errorReasonText;
+    if (tipo === 'error') {
+      errorReasonText = (c.reglas_no_hacer && c.reglas_no_hacer.length) ? (typeof c.reglas_no_hacer[0] === 'string' ? c.reglas_no_hacer[0] : (c.reglas_no_hacer[0].texto || '')) : 'La opción correcta es la que identifica el error principal del caso.';
+    } else {
+      errorReasonText = (c.errores && c.errores.length) ? (typeof c.errores[0] === 'string' ? c.errores[0] : (c.errores[0].texto || '')) : ((c.reglas_no_hacer && c.reglas_no_hacer.length) ? (typeof c.reglas_no_hacer[0] === 'string' ? c.reglas_no_hacer[0] : (c.reglas_no_hacer[0].texto || '')) : 'Revisar guía antes de responder.');
+    }
+    var wedukaInfo = (c && crToWeduka[c.contact_reason]) ? crToWeduka[c.contact_reason] : { url: '', seccion: c.contact_reason || 'Weduka' };
+    var wedukaUrl = wedukaInfo.url || getWedukaUrl(c);
+    var wedukaSection = wedukaInfo.seccion || c.contact_reason || 'Weduka';
+    return '<div class="quiz-pregunta" data-caso-idx="' + casoIdx + '" data-correct-idx="' + correctIdx + '" data-weduka-url="' + esc(wedukaUrl) + '">' +
+      contextoHtml +
+      '<p class="quiz-label">' + esc(label) + '</p>' +
+      '<div class="quiz-opciones-wrap">' + optsHtml + '</div>' +
+      '<span class="quiz-meta hidden">' +
+      '<span class="quiz-correct-text">' + esc(correctAnswerText) + '</span>' +
+      '<span class="quiz-error-text">' + esc(errorReasonText) + '</span>' +
+      '<span class="quiz-weduka-section">' + esc(wedukaSection) + '</span>' +
+      '</span>' +
+      '<div class="quiz-feedback"></div>' +
+      '</div>';
+  }
+
+  function bindQuestionEvents(block, casoIdx, correctIdx, opts, feedbackEl) {
+    if (!block) return;
+    var locked = false;
+    var correctTextEl = block.querySelector('.quiz-correct-text');
+    var errorTextEl = block.querySelector('.quiz-error-text');
+    var wedukaSectionEl = block.querySelector('.quiz-weduka-section');
+    var wedukaUrl = block.getAttribute('data-weduka-url') || (block.querySelector('a[href*="weduka"]') && block.querySelector('a[href*="weduka"]').href) || '';
+    for (var i = 0; i < opts.length; i++) {
+      (function (idx) {
+        opts[idx].onclick = function () {
+          if (locked) return;
+          locked = true;
+          var isCorrect = idx === correctIdx;
+          for (var j = 0; j < opts.length; j++) opts[j].disabled = true;
+          if (feedbackEl) {
+            feedbackEl.classList.remove('hidden');
+            if (isCorrect) {
+              feedbackEl.className = 'quiz-feedback ok';
+              feedbackEl.innerHTML = '<strong>✓ Correcto.</strong> Es la respuesta adecuada según la guía.';
+            } else {
+              feedbackEl.className = 'quiz-feedback error';
+              var selectedText = (opts[idx] && opts[idx].textContent) ? opts[idx].textContent.trim() : '';
+              var correctText = (correctTextEl && correctTextEl.textContent) ? correctTextEl.textContent : '';
+              var errorText = (errorTextEl && errorTextEl.textContent) ? errorTextEl.textContent : 'Revisar guía antes de responder.';
+              var sectionText = (wedukaSectionEl && wedukaSectionEl.textContent) ? wedukaSectionEl.textContent : 'Weduka';
+              feedbackEl.innerHTML =
+                (selectedText ? '<p class="quiz-feedback-intro">Seleccionaste: <em>' + esc(selectedText) + '</em></p>' : '') +
+                '<p class="quiz-feedback-box-label quiz-feedback-label-correct">✓ Respuesta correcta</p>' +
+                '<div class="quiz-feedback-box quiz-feedback-correct">' + esc(correctText) + '</div>' +
+                '<p class="quiz-feedback-box-label quiz-feedback-label-incorrect">Por qué no es correcto</p>' +
+                '<div class="quiz-feedback-box quiz-feedback-incorrect">' + esc(errorText) + '</div>' +
+                '<p class="quiz-feedback-weduka-title">Consulta el proceso en Weduka y vuelve a intentar:</p>' +
+                '<p class="quiz-feedback-weduka-section">Sección: ' + esc(sectionText) + '</p>' +
+                '<div class="quiz-feedback-actions">' +
+                (wedukaUrl ? '<a href="' + esc(wedukaUrl) + '" target="_blank" rel="noopener" class="quiz-btn quiz-btn-weduka">Abrir Weduka</a>' : '') +
+                '<button type="button" class="quiz-btn quiz-btn-retry">Intentar de nuevo</button></div>';
+              var retryBtn = feedbackEl.querySelector('.quiz-btn-retry');
+              if (retryBtn) retryBtn.onclick = function () { showRuletaScreen(); };
+            }
+          }
+        };
+      })(i);
+    }
+  }
+
+  function showRuletaScreen() {
+    var ruletaScreen = document.getElementById('quiz-ruleta-screen') || document.querySelector('.quiz-ruleta-screen');
+    var questionScreen = document.getElementById('quiz-question-screen') || document.querySelector('.quiz-question-screen');
+    if (ruletaScreen) ruletaScreen.style.display = 'flex';
+    if (questionScreen) { questionScreen.style.display = 'none'; questionScreen.classList.remove('active'); }
+  }
+
+  function showQuestionScreen() {
+    var ruletaScreen = document.getElementById('quiz-ruleta-screen') || document.querySelector('.quiz-ruleta-screen');
+    var questionScreen = document.getElementById('quiz-question-screen') || document.querySelector('.quiz-question-screen');
+    if (ruletaScreen) ruletaScreen.style.display = 'none';
+    if (questionScreen) { questionScreen.style.display = 'block'; questionScreen.classList.add('active'); }
+  }
+
+  function spinAndShowQuestion() {
+    var quizContainer = document.getElementById('quiz-container') || document.querySelector('#quiz-container');
+    var circle = document.getElementById('quiz-ruleta-circle') || document.querySelector('.quiz-ruleta-circle');
+    var girarBtn = document.getElementById('quiz-girar-btn') || document.querySelector('.quiz-girar-btn') || document.getElementById('girar-btn');
+    if (!quizContainer || !circle || !girarBtn) return;
+    girarBtn.disabled = true;
+    var idx = Math.floor(Math.random() * casos.length);
+    circle.classList.add('spinning');
+    setTimeout(function () {
+      circle.classList.remove('spinning');
+      var deg = 360 * 3 + Math.random() * 360;
+      circle.style.transform = 'rotate(' + deg + 'deg)';
+      var html = buildOneQuestion(idx);
+      var contentArea = quizContainer;
+      if (contentArea) {
+        contentArea.innerHTML = html;
+        var block = contentArea.querySelector('.quiz-pregunta');
+        if (block) {
+          var casoIdx = parseInt(block.getAttribute('data-caso-idx'), 10);
+          var correctIdx = parseInt(block.getAttribute('data-correct-idx'), 10);
+          var opts = block.querySelectorAll('.quiz-opcion');
+          var feedbackEl = block.querySelector('.quiz-feedback');
+          bindQuestionEvents(block, casoIdx, correctIdx, opts, feedbackEl);
+        }
+      }
+      showQuestionScreen();
+      girarBtn.disabled = false;
+    }, 2500);
+  }
+
+  function initRuleta() {
+    var girarBtn = document.getElementById('quiz-girar-btn') || document.getElementById('girar-btn') || document.querySelector('.quiz-girar-btn');
+    var girarOtraBtn = document.getElementById('quiz-girar-otra-btn') || document.getElementById('girar-otra-btn') || document.querySelector('.quiz-girar-otra-btn');
+    if (girarBtn) girarBtn.onclick = spinAndShowQuestion;
+    if (girarOtraBtn) girarOtraBtn.onclick = showRuletaScreen;
+    showRuletaScreen();
+  }
+
+  if (Object.keys(defs || {}).length > 0) {
+    renderDefiniciones();
+  }
+
+  initRuleta();
+
+  window.goToRandomCaseByContactReason = function (contactReason) {
+    if (!contactReason) return;
+    var indices = [];
+    for (var i = 0; i < casos.length; i++) {
+      if (casos[i].contact_reason === contactReason) indices.push(i);
+    }
+    if (indices.length === 0) return;
+    for (var j = indices.length - 1; j > 0; j--) {
+      var r = Math.floor(Math.random() * (j + 1));
+      var t = indices[j];
+      indices[j] = indices[r];
+      indices[r] = t;
+    }
+    var idx = indices[0];
+    buildCaseSlides([idx]);
+    if (typeof window.goToSlide === 'function') window.goToSlide(4);
+  };
+
+  window.goToRandomDudasCase = function () {
+    window.goToRandomCaseByContactReason('Dudas sobre el Resultado de Solicitud (Declinado, Cancelado o Erróneo)');
+  };
+})();
+
+  </script>
+  <script>
+/**
+ * Correcciones feedback 3/3/26:
+ * 1. Tarjetas BPO como botones que redirigen a temas (slide 2).
+ * 2. Slide Contact Reasons: contenido con "Qué sí hacer" / "Qué no hacer" además de la descripción.
+ */
+(function() {
+  function esc(s) {
+    if (s == null) return '';
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function goToSlide(n) {
+    if (typeof window.goToSlide === 'function') window.goToSlide(n);
+  }
+
+  // ——— 1. Tarjetas BPO clicables → ir a slide 2 ———
+  function initBpoCards() {
+    var cards = document.querySelectorAll('#slide-1 .bpo-card-item');
+    cards.forEach(function(card) {
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.classList.add('bpo-card-btn');
+      card.onclick = function() { goToSlide(2); };
+      card.onkeydown = function(e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goToSlide(2); }
+      };
+    });
+  }
+
+  // ——— 2. Slide 2: construir contenido con descripción + Qué no hacer + Qué sí hacer ———
+  function buildSlide2Content() {
+    var container = document.getElementById('slide-2-cr-content');
+    if (!container) {
+      var slide2 = document.getElementById('slide-2');
+      container = slide2 ? slide2.querySelector('.cr-resumen-list') : null;
+      if (container) container.id = 'slide-2-cr-content';
+    }
+    if (!container) return;
+    var data = window.CASOS_MAL_GESTIONADOS || {};
+    var defs = data.contact_reasons_definiciones || {};
+    var casos = data.casos || [];
+    var order = [
+      'Dudas sobre el Resultado de Solicitud (Declinado, Cancelado o Erróneo)',
+      'Errores en el flujo de registro',
+      'Registro, aplicación e información de productos Nu (Prospecto)'
+    ];
+    var html = '';
+    order.forEach(function(cr) {
+      var info = defs[cr];
+      var desc = info ? (info.descripcion || '') : '';
+      var noHacer = [];
+      var siHacer = [];
+      casos.forEach(function(c) {
+        if (c.contact_reason !== cr) return;
+        (c.reglas_no_hacer || []).forEach(function(r) {
+          if (r && noHacer.indexOf(r) === -1) noHacer.push(r);
+        });
+        (c.reglas_si_hacer || []).forEach(function(r) {
+          if (r && siHacer.indexOf(r) === -1) siHacer.push(r);
+        });
+      });
+      html += '<div class="cr-resumen-item" id="cr-item-' + esc(cr).replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '') + '">';
+      html += '<div class="cr-resumen-item-header">';
+      html += '<strong class="cr-resumen-titulo">' + esc(cr) + '</strong>';
+      html += '<button type="button" class="cr-resumen-btn-practicar">Ir a practicar</button>';
+      html += '</div>';
+      html += '<p class="cr-resumen-desc">' + esc(desc) + '</p>';
+      if (noHacer.length) {
+        html += '<div class="cr-resumen-reglas cr-resumen-no"><button type="button" class="cr-resumen-toggle" aria-expanded="false"><span class="cr-resumen-toggle-icon">▶</span><span class="cr-resumen-reglas-label">Qué no hacer</span><span class="cr-resumen-toggle-count">' + noHacer.length + '</span></button><div class="cr-resumen-reglas-list"><ul>';
+        noHacer.forEach(function(r) { html += '<li>' + esc(r) + '</li>'; });
+        html += '</ul></div></div>';
+      }
+      if (siHacer.length) {
+        html += '<div class="cr-resumen-reglas cr-resumen-si"><button type="button" class="cr-resumen-toggle" aria-expanded="false"><span class="cr-resumen-toggle-icon">▶</span><span class="cr-resumen-reglas-label">Qué sí hacer</span><span class="cr-resumen-toggle-count">' + siHacer.length + '</span></button><div class="cr-resumen-reglas-list"><ul>';
+        siHacer.forEach(function(r) { html += '<li>' + esc(r) + '</li>'; });
+        html += '</ul></div></div>';
+      }
+      html += '</div>';
+    });
+    container.innerHTML = html;
+    initSlide2BlockClicks(order);
+  }
+
+  function initSlide2BlockClicks(contactReasonOrder) {
+    var container = document.getElementById('slide-2-cr-content');
+    if (!container || !contactReasonOrder || !contactReasonOrder.length) return;
+    var items = container.querySelectorAll('.cr-resumen-item');
+    for (var i = 0; i < items.length && i < contactReasonOrder.length; i++) {
+      var cr = contactReasonOrder[i];
+      var item = items[i];
+      item.classList.add('cr-resumen-item--go-caso');
+      item.style.cursor = 'pointer';
+      item.title = 'Clic para ir a elegir casos';
+      item.addEventListener('click', (function(contactReason) {
+        return function(e) {
+          if (e.target.closest('.cr-resumen-toggle')) return;
+          window.slide3OpenTab = contactReason;
+          if (typeof window.goToSlide === 'function') window.goToSlide(3);
+        };
+      })(cr));
+    }
+  }
+
+  // Desplegables: toggle al hacer clic en el botón
+  function initToggles() {
+    document.addEventListener('click', function(e) {
+      var btn = e.target.closest('.cr-resumen-toggle');
+      if (!btn) return;
+      var block = btn.closest('.cr-resumen-reglas');
+      if (!block) return;
+      var open = block.classList.toggle('abierto');
+      btn.setAttribute('aria-expanded', open);
+    });
+  }
+
+  // Inyectar estilos para tarjetas botón, bloques de reglas y desplegables
+  function injectStyles() {
+    var style = document.createElement('style');
+    style.textContent = [
+      '#slide-1 .bpo-card-item.bpo-card-btn { cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }',
+      '#slide-1 .bpo-card-item.bpo-card-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(106, 27, 154, 0.15); }',
+      '#slide-1 .bpo-card-item.bpo-card-btn:focus { outline: 2px solid var(--purple-500); outline-offset: 2px; }',
+      '.cr-resumen-reglas { margin-top: 1rem; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }',
+      '.cr-resumen-reglas .cr-resumen-toggle { display: flex; align-items: center; gap: 0.6rem; width: 100%; padding: 0.85rem 1.15rem; border: none; cursor: pointer; font-family: inherit; text-align: left; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.03em; transition: background 0.2s, color 0.2s; }',
+      '.cr-resumen-reglas .cr-resumen-toggle-icon { display: inline-flex; align-items: center; justify-content: center; transition: transform 0.25s ease; flex-shrink: 0; font-size: 0.7rem; width: 1.2em; }',
+      '.cr-resumen-reglas.abierto .cr-resumen-toggle-icon { transform: rotate(90deg); }',
+      '.cr-resumen-reglas .cr-resumen-toggle-count { margin-left: auto; font-size: 0.8rem; opacity: 0.9; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 20px; background: rgba(0,0,0,0.06); }',
+      '.cr-resumen-reglas-list { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }',
+      '.cr-resumen-reglas.abierto .cr-resumen-reglas-list { max-height: 70vh; }',
+      '.cr-resumen-no { background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border: 1px solid rgba(220, 38, 38, 0.2); }',
+      '.cr-resumen-no .cr-resumen-toggle { background: transparent; color: #b91c1c; }',
+      '.cr-resumen-no .cr-resumen-toggle:hover { background: rgba(220, 38, 38, 0.06); }',
+      '.cr-resumen-no .cr-resumen-reglas-list ul { margin: 0; padding: 0.5rem 1.15rem 1rem 1.5rem; font-size: 0.92rem; line-height: 1.6; color: #374151; list-style: none; }',
+      '.cr-resumen-no .cr-resumen-reglas-list li { padding-left: 1.25rem; position: relative; margin-bottom: 0.4rem; }',
+      '.cr-resumen-no .cr-resumen-reglas-list li::before { content: "·"; position: absolute; left: 0; font-weight: 700; color: #dc2626; font-size: 1.2em; }',
+      '.cr-resumen-si { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1px solid rgba(22, 163, 74, 0.2); }',
+      '.cr-resumen-si .cr-resumen-toggle { background: transparent; color: #15803d; }',
+      '.cr-resumen-si .cr-resumen-toggle:hover { background: rgba(22, 163, 74, 0.06); }',
+      '.cr-resumen-si .cr-resumen-reglas-list ul { margin: 0; padding: 0.5rem 1.15rem 1rem 1.5rem; font-size: 0.92rem; line-height: 1.6; color: #374151; list-style: none; }',
+      '.cr-resumen-si .cr-resumen-reglas-list li { padding-left: 1.25rem; position: relative; margin-bottom: 0.4rem; }',
+      '.cr-resumen-si .cr-resumen-reglas-list li::before { content: "·"; position: absolute; left: 0; font-weight: 700; color: #16a34a; font-size: 1.2em; }',
+      '.cr-resumen-item-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.25rem; }',
+      '.cr-resumen-item-header .cr-resumen-titulo { margin-bottom: 0; flex: 1 1 auto; min-width: 0; }',
+      '.cr-resumen-btn-practicar { flex-shrink: 0; padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 700; color: #fff; background: #6a1b9a; border: none; border-radius: 10px; cursor: pointer; font-family: inherit; transition: background 0.2s, transform 0.15s; }',
+      '.cr-resumen-btn-practicar:hover { background: #5a1578; transform: translateY(-1px); }',
+      '#slide-2-cr-content .cr-resumen-item--go-caso .cr-resumen-titulo { transition: color 0.2s; }',
+      '#slide-2-cr-content .cr-resumen-item--go-caso:hover .cr-resumen-titulo { color: #6a1b9a; text-decoration: underline; }'
+    ].join('\n');
+    document.head.appendChild(style);
+  }
+
+  function init() {
+    injectStyles();
+    initToggles();
+    initBpoCards();
+    buildSlide2Content();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+
+  </script>
+</body>
+</html>
+<!-- FIN REFUERZO CR - Si ves esta linea al pegar, el codigo esta completo. -->
